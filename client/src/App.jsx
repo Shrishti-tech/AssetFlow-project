@@ -20,6 +20,7 @@ import AllocationHistory from "./pages/allocation/AllocationHistory";
 import ReturnAsset from "./pages/allocation/ReturnAsset";
 import Analytics from "./pages/reports/Analytics";
 import Profile from "./pages/profile/Profile";
+import { OrganizationSetup } from "./organization";
 import "./styles.css";
 
 export default function App() {
@@ -34,118 +35,21 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Route>
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/assets"
-            element={
-              <ProtectedRoute>
-                <AssetList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/assets/new"
-            element={
-              <ProtectedRoute>
-                <AddAsset />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bookings"
-            element={
-              <ProtectedRoute>
-                <BookingHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bookings/new"
-            element={
-              <ProtectedRoute>
-                <BookResource />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/maintenance"
-            element={
-              <ProtectedRoute>
-                <MaintenanceList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/maintenance/new"
-            element={
-              <ProtectedRoute>
-                <RaiseRequest />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/allocation"
-            element={
-              <ProtectedRoute>
-                <AllocateAsset />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/allocations"
-            element={
-              <ProtectedRoute>
-                <AllocationList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/allocations/history"
-            element={
-              <ProtectedRoute>
-                <AllocationHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/returns"
-            element={
-              <ProtectedRoute>
-                <ReturnAsset />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/transfers"
-            element={
-              <ProtectedRoute>
-                <TransferAsset />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/assets" element={<ProtectedRoute><AssetList /></ProtectedRoute>} />
+          <Route path="/assets/new" element={<ProtectedRoute><AddAsset /></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/bookings/new" element={<ProtectedRoute><BookResource /></ProtectedRoute>} />
+          <Route path="/maintenance" element={<ProtectedRoute><MaintenanceList /></ProtectedRoute>} />
+          <Route path="/maintenance/new" element={<ProtectedRoute><RaiseRequest /></ProtectedRoute>} />
+          <Route path="/allocation" element={<ProtectedRoute><AllocateAsset /></ProtectedRoute>} />
+          <Route path="/allocations" element={<ProtectedRoute><AllocationList /></ProtectedRoute>} />
+          <Route path="/allocations/history" element={<ProtectedRoute><AllocationHistory /></ProtectedRoute>} />
+          <Route path="/returns" element={<ProtectedRoute><ReturnAsset /></ProtectedRoute>} />
+          <Route path="/transfers" element={<ProtectedRoute><TransferAsset /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>

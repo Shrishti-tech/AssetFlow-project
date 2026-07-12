@@ -1,0 +1,1 @@
+export default function SearchBar({ value, onChange, placeholder = 'Search...' }) { return <label className="org-search"><span>⌕</span><input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label> }

@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   const unreadCount = useMemo(() => items.filter((item) => !item.read).length, [items])
   const signOut = async () => { await logout(); navigate('/login') }
-  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Reports: '/reports', 'Help & support': '/profile' }
+  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Organization: '/organization', Reports: '/reports', 'Help & support': '/profile' }
   const selectPage = (page) => { setActivePage(page); setSidebarOpen(false); navigate(routes[page] || '/dashboard') }
   const runAction = (label) => {
     const actionRoutes = { 'Register Asset': '/assets/new', 'Book Resource': '/bookings/new', 'Raise Maintenance Request': '/maintenance/new' }

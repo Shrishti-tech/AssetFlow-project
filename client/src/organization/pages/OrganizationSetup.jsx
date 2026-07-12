@@ -1,0 +1,20 @@
+import { useEffect, useMemo, useState } from 'react'
+import DepartmentList from '../components/Department/DepartmentList'
+import CategoryList from '../components/Category/CategoryList'
+import EmployeeList from '../components/Employee/EmployeeList'
+import { departmentService } from '../services/departmentService'
+import { categoryService } from '../services/categoryService'
+import { employeeService } from '../services/employeeService'
+import '../styles/organization.css'; import '../styles/department.css'; import '../styles/category.css'; import '../styles/employee.css'
+
+const initials = (name = '') => name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()
+const mapId = (item) => ({ ...item, id: item.id || item._id })
+export default function OrganizationSetup() {
+  const [tab, setTab] = useState('departments'); const [departments, setDepartments] = useState([]); const [categories, setCategories] = useState([]); const [employees, setEmployees] = useState([]); const [notice, setNotice] = useState(''); const [loading, setLoading] = useState(true)
+  const notify = (message) => { setNotice(message); window.setTimeout(() => setNotice(''), 3200) }
+  const load = async () => { setLoading(true); try { const [d, c, e] = await Promise.all([departmentService.list(), categoryService.list(), employeeService.list()]); setDepartments(d.data.departments.map(mapId)); setCategories(c.data.categories.map(mapId)); setEmployees(e.data.employees.map((item) => ({ ...mapId(item), name: item.fullName, initials: initials(item.fullName) }))) } catch (error) { notify(error.response?.data?.message || 'Unable to load organization data. Administrator access is required.') } finally { setLoading(false) } }
+  useEffect(() => { load() }, [])
+  const departmentNames = useMemo(() => departments.map((item) => item.name), [departments])
+  const panels = { departments: <DepartmentList items={departments} onCreate={async (data) => { await departmentService.create(data); await load(); notify('Department added') }} onUpdate={async (id, data) => { await departmentService.update(id, data); await load(); notify('Department updated') }} onDelete={async (id) => { await departmentService.remove(id); await load(); notify('Department removed') }} notify={notify} />, categories: <CategoryList items={categories} onCreate={async (data) => { await categoryService.create(data); await load(); notify('Category added') }} onUpdate={async (id, data) => { await categoryService.update(id, data); await load(); notify('Category updated') }} onDelete={async (id) => { await categoryService.remove(id); await load(); notify('Category removed') }} notify={notify} />, employees: <EmployeeList items={employees} departments={departmentNames} onCreate={async (data) => { await employeeService.create(data); await load(); notify('Employee added') }} onUpdate={async (id, data) => { await employeeService.update(id, data); await load(); notify('Employee updated') }} onDelete={async (id) => { await employeeService.remove(id); await load(); notify('Employee removed') }} notify={notify} /> }
+  return <main className="organization-page"><div className="organization-hero"><div><p>ORGANIZATION SETUP</p><h1>Build your workspace</h1><span>Manage the people, teams, and asset categories that power AssetFlow.</span></div><div className="organization-summary"><b>{departments.length}</b><span>Departments</span><b>{employees.length}</b><span>Employees</span><b>{categories.length}</b><span>Categories</span></div></div><div className="organization-tabs" role="tablist">{[['departments', 'Department Management'], ['categories', 'Asset Categories'], ['employees', 'Employee Directory']].map(([id, label]) => <button role="tab" aria-selected={tab === id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)} key={id}>{label}</button>)}</div>{loading ? <p className="empty-state">Loading organization setup…</p> : panels[tab]}{notice && <div className="organization-toast" role="status">✓ {notice}</div>}</main>
+}
