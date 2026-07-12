@@ -49,6 +49,11 @@ allocationRoutes.put(
   allocationController.rejectTransfer,
 );
 allocationRoutes.get(
+  "/dashboard/summary",
+  requireAllocationAccess,
+  allocationController.summary,
+);
+allocationRoutes.get(
   "/:id/history",
   requireAllocationAccess,
   allocationController.history,

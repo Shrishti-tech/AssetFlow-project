@@ -120,6 +120,15 @@ export const allocationController = {
       next(error);
     }
   },
+
+  async summary(req, res, next) {
+    try {
+      const summary = await allocationService.getDashboardSummary();
+      res.json(summary);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export default allocationController;

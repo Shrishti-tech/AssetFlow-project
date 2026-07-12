@@ -35,6 +35,7 @@ const allocationSchema = new mongoose.Schema(
       default: "active",
     },
     allocatedAt: { type: Date, default: Date.now },
+    expectedReturnDate: { type: Date },
     returnedAt: { type: Date },
     notes: { type: String, trim: true },
   },
