@@ -1,1 +1,5 @@
-export default function AllocateAsset() { return <h1>Allocate asset</h1> }
+import AllocateAssetPage from "../../allocation/pages/AllocateAsset";
+
+export default function AllocateAsset() {
+  return <AllocateAssetPage />;
+}

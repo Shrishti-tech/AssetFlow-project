@@ -1,1 +1,5 @@
-export default function TransferAsset() { return <h1>Transfer asset</h1> }
+import TransferRequestPage from "../../allocation/pages/TransferRequest";
+
+export default function TransferAsset() {
+  return <TransferRequestPage />;
+}
