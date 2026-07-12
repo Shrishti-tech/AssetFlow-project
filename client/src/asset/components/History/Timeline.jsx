@@ -1,0 +1,1 @@
+export default function Timeline({ events = [] }) { return <ol className="asset-timeline">{events.map((event, index) => <li key={`${event.title}-${index}`}><b>{event.title}</b><span>{event.date}</span><p>{event.detail}</p></li>)}</ol> }

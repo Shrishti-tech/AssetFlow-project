@@ -1,0 +1,1 @@
+export default function FilterPanel({ category, setCategory, categories }) { return <select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">All categories</option>{categories.map((item) => <option key={item}>{item}</option>)}</select> }

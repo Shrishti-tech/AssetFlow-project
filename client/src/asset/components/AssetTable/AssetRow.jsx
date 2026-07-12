@@ -1,0 +1,3 @@
+import { Link } from 'react-router-dom'
+import AssetStatusBadge from './AssetStatusBadge'
+export default function AssetRow({ asset, onDelete }) { return <tr><td><div className="asset-thumb">{asset.image ? <img src={asset.image} alt="" /> : asset.name.slice(0, 1)}</div></td><td><strong>{asset.name}</strong><small>{asset.serialNumber || 'No serial number'}</small></td><td>{asset.category}</td><td><code>{asset.assetTag}</code></td><td>{asset.department}</td><td><AssetStatusBadge status={asset.status} /></td><td className="asset-row-actions"><Link to={`/assets/${asset.id}`}>View</Link><Link to={`/assets/${asset.id}/edit`}>Edit</Link><button type="button" onClick={() => onDelete(asset.id)}>Delete</button></td></tr> }

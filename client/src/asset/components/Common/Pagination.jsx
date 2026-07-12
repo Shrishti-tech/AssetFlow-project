@@ -1,0 +1,1 @@
+export default function Pagination({ page, total, onChange }) { return <div className="asset-pagination"><button disabled={page === 1} onClick={() => onChange(page - 1)}>Previous</button><span>Page {page} of {total || 1}</span><button disabled={page >= total} onClick={() => onChange(page + 1)}>Next</button></div> }

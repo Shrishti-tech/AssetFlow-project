@@ -1,0 +1,1 @@
+export default function AllocationHistory({ asset }) { return <section className="asset-history-section"><h3>Allocation history</h3><p>{asset.shared ? 'This asset is available for shared bookings.' : 'No allocation records yet.'}</p></section> }

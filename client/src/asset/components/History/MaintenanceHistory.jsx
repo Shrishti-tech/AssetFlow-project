@@ -1,0 +1,1 @@
+export default function MaintenanceHistory({ asset }) { return <section className="asset-history-section"><h3>Maintenance history</h3><p>{asset.condition === 'Needs repair' ? 'Maintenance review is required.' : 'No maintenance records yet.'}</p></section> }

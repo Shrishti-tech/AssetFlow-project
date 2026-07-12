@@ -1,0 +1,1 @@
+export default function AssetQRCode({ assetTag }) { return <section className="asset-qr"><h3>Asset QR code</h3><div className="asset-qr-code" aria-label={`QR code for ${assetTag}`}>{Array.from({ length: 49 }, (_, i) => <i key={i} className={(i * 7 + i % 5) % 3 ? '' : 'dark'} />)}</div><code>{assetTag}</code></section> }

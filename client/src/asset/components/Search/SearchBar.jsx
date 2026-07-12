@@ -1,0 +1,1 @@
+export default function SearchBar({ value, onChange }) { return <input className="asset-search" value={value} onChange={(e) => onChange(e.target.value)} placeholder="Search name, tag, serial number..." /> }

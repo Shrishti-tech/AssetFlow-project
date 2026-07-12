@@ -1,0 +1,6 @@
+export { AssetProvider, useAssets } from './services/assetService'
+export { default as AssetDirectory } from './pages/AssetDirectory'
+export { default as RegisterAsset } from './pages/RegisterAsset'
+export { default as AssetDetails } from './pages/AssetDetails'
+export { default as AssetHistory } from './pages/AssetHistory'
+export { default as EditAsset } from './pages/EditAsset'

@@ -1,0 +1,1 @@
+export default function SortDropdown({ value, onChange }) { return <select value={value} onChange={(e) => onChange(e.target.value)}><option value="name">Name</option><option value="category">Category</option><option value="department">Department</option></select> }

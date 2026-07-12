@@ -7,8 +7,7 @@ import ForgotPassword from "./auth/pages/ForgotPassword";
 import ResetPassword from "./auth/pages/ResetPassword";
 import ProtectedRoute from "./auth/routes/ProtectedRoute";
 import Dashboard from "./dashboard/Dashboard";
-import AssetList from "./assets/AssetList";
-import AddAsset from "./assets/AddAsset";
+import { AssetDetails, AssetDirectory, AssetHistory, AssetProvider, EditAsset, RegisterAsset } from "./asset";
 import BookResource from "./pages/booking/BookResource";
 import BookingHistory from "./pages/booking/BookingHistory";
 import RaiseRequest from "./pages/maintenance/RaiseRequest";
@@ -27,6 +26,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <AssetProvider>
         <Routes>
           <Route element={<AuthLayout />}>
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -36,8 +36,11 @@ export default function App() {
             <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Route>
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/assets" element={<ProtectedRoute><AssetList /></ProtectedRoute>} />
-          <Route path="/assets/new" element={<ProtectedRoute><AddAsset /></ProtectedRoute>} />
+          <Route path="/assets" element={<ProtectedRoute><AssetDirectory /></ProtectedRoute>} />
+          <Route path="/assets/new" element={<ProtectedRoute><RegisterAsset /></ProtectedRoute>} />
+          <Route path="/assets/:id" element={<ProtectedRoute><AssetDetails /></ProtectedRoute>} />
+          <Route path="/assets/:id/history" element={<ProtectedRoute><AssetHistory /></ProtectedRoute>} />
+          <Route path="/assets/:id/edit" element={<ProtectedRoute><EditAsset /></ProtectedRoute>} />
           <Route path="/bookings" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
           <Route path="/bookings/new" element={<ProtectedRoute><BookResource /></ProtectedRoute>} />
           <Route path="/maintenance" element={<ProtectedRoute><MaintenanceList /></ProtectedRoute>} />
@@ -52,6 +55,7 @@ export default function App() {
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </AssetProvider>
       </AuthProvider>
     </BrowserRouter>
   );

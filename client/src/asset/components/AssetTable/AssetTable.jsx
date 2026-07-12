@@ -1,0 +1,2 @@
+import AssetRow from './AssetRow'
+export default function AssetTable({ assets, onDelete }) { return <div className="asset-table-wrap"><table className="asset-table"><thead><tr><th>Asset</th><th>Name</th><th>Category</th><th>Tag</th><th>Department</th><th>Status</th><th /></tr></thead><tbody>{assets.map((asset) => <AssetRow key={asset.id} asset={asset} onDelete={onDelete} />)}</tbody></table>{!assets.length && <p className="asset-empty">No assets match the current filters.</p>}</div> }
