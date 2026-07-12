@@ -1,4 +1,4 @@
-const items = [['Overview', '⌂'], ['Assets', '▣'], ['Allocation', '⇄'], ['Bookings', '◷'], ['Maintenance', '⌁'], ['Transfers', '↗'], ['Organization', '♙'], ['Reports', '▤']]
+const items = [['Overview', '⌂'], ['Assets', '▣'], ['Allocation', '⇄'], ['Bookings', '◷'], ['Maintenance', '⌁'], ['Transfers', '↗'], ['Organization', '♙'], ['Reports', '▤'], ['Audits', '✓']]
 
 export default function Sidebar({ activePage, isOpen, collapsed, onSelect, onClose, onToggle }) {
   return <aside className={`erp-sidebar ${isOpen ? 'is-open' : ''}`}>

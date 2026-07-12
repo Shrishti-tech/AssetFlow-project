@@ -27,6 +27,11 @@ import DepartmentReport from "./pages/reports/DepartmentReport";
 import BookingHeatmap from "./pages/reports/BookingHeatmap";
 import MaintenanceReport from "./pages/reports/MaintenanceReport";
 import ExportReport from "./pages/reports/ExportReport";
+import AuditCycle from "./pages/audit/AuditCycle";
+import AssignAuditor from "./pages/audit/AssignAuditor";
+import AuditVerification from "./pages/audit/AuditVerification";
+import DiscrepancyReport from "./pages/audit/DiscrepancyReport";
+import AuditHistory from "./pages/audit/AuditHistory";
 import Profile from "./pages/profile/Profile";
 import Notifications from "./pages/notifications/Notifications";
 import { OrganizationSetup } from "./organization";
@@ -72,6 +77,11 @@ export default function App() {
           <Route path="/reports/bookings" element={<ProtectedRoute><BookingHeatmap /></ProtectedRoute>} />
           <Route path="/reports/maintenance" element={<ProtectedRoute><MaintenanceReport /></ProtectedRoute>} />
           <Route path="/reports/export" element={<ProtectedRoute><ExportReport /></ProtectedRoute>} />
+          <Route path="/audits" element={<ProtectedRoute><AuditCycle /></ProtectedRoute>} />
+          <Route path="/audits/history" element={<ProtectedRoute><AuditHistory /></ProtectedRoute>} />
+          <Route path="/audits/:id/assign" element={<ProtectedRoute><AssignAuditor /></ProtectedRoute>} />
+          <Route path="/audits/:id/verify" element={<ProtectedRoute><AuditVerification /></ProtectedRoute>} />
+          <Route path="/audits/:id/report" element={<ProtectedRoute><DiscrepancyReport /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />

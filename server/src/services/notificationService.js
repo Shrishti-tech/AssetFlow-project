@@ -13,10 +13,17 @@ const triggerText = {
   "Technician Assigned": "Technician assigned",
   "Repair Started": "Repair started",
   "Repair Completed": "Repair completed",
+  "Audit Cycle Created": "Audit cycle created",
+  "Auditor Assigned": "Auditor assigned",
+  "Audit Started": "Audit started",
+  "Asset Verified": "Asset verified",
+  "Discrepancy Detected": "Discrepancy detected",
+  "Audit Completed": "Audit completed",
 };
 
 const bookingLabel = (booking) => booking?.purpose || "Resource booking";
 const maintenanceLabel = (maintenance) => maintenance?.issue || "Maintenance request";
+const auditLabel = (audit) => audit?.title || "Audit cycle";
 
 export const notificationService = {
   async list(query = {}) {
@@ -67,6 +74,22 @@ export const notificationService = {
       user: maintenance.requestedBy,
       recipient: maintenance.requestedBy,
       type: trigger.includes("Rejected") ? "warning" : "info",
+    });
+  },
+
+  async createForAudit(trigger, audit, recipient, extraMessage = "") {
+    if (!audit?._id || !recipient) return null;
+    const title = triggerText[trigger] || trigger;
+    const message = extraMessage || `${auditLabel(audit)} ${title.toLowerCase()}.`;
+
+    return Notification.create({
+      trigger,
+      title,
+      message,
+      audit: audit._id,
+      user: recipient,
+      recipient,
+      type: trigger === "Discrepancy Detected" ? "warning" : "info",
     });
   },
 
