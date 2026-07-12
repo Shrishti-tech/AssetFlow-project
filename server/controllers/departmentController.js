@@ -1,7 +1,7 @@
 import { Department } from '../models/Department.js'
 import { User } from '../models/User.js'
 
-const fields = ['name', 'code', 'manager', 'location', 'status']
+const fields = ['name', 'code', 'manager', 'parentDepartment', 'location', 'status']
 const values = (body) => Object.fromEntries(fields.map((field) => [field, body[field]]))
 
 export async function listDepartments(req, res, next) {
