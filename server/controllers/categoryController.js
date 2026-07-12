@@ -1,6 +1,6 @@
 import { Category } from '../models/Category.js'
 
-const fields = ['name', 'code', 'description', 'status']
+const fields = ['name', 'code', 'description', 'specificFieldValue', 'status']
 const values = (body) => Object.fromEntries(fields.map((field) => [field, body[field]]))
 
 export async function listCategories(req, res, next) { try { const filter = req.query.search ? { $or: ['name', 'code', 'description'].map((field) => ({ [field]: { $regex: req.query.search, $options: 'i' } })) } : {}; const categories = await Category.find(filter).sort({ name: 1 }); res.json({ categories }) } catch (error) { next(error) } }

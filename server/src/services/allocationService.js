@@ -26,7 +26,7 @@ async function createOverdueNotifications() {
 export const allocationService = {
   async getOptions() {
     const [assets, employees] = await Promise.all([
-      Asset.find({ status: 'available' }).select('name assetTag department location').sort({ name: 1 }),
+      Asset.find({ status: { $in: ['available', 'allocated'] } }).select('name assetTag status department location').sort({ name: 1 }),
       User.find({ status: 'Active' }).select('fullName email department').sort({ fullName: 1 }),
     ])
     return { assets, employees, departments: [...new Set(employees.map((employee) => employee.department).filter(Boolean))].sort() }
@@ -54,8 +54,14 @@ export const allocationService = {
     const [asset, employee] = await Promise.all([Asset.findById(data.asset), User.findById(data.assignedTo)])
     if (!asset) throw problem('Asset not found.', 404)
     if (!employee || employee.status !== 'Active') throw problem('Select an active employee.')
-    if (asset.status !== 'available') throw problem('Only available assets can be allocated.')
-    if (await Allocation.exists({ asset: asset._id, status: 'active' })) throw problem('This asset already has an active allocation.')
+    const activeAllocation = await Allocation.findOne({ asset: asset._id, status: 'active' }).populate('assignedTo', 'fullName')
+    if (activeAllocation) {
+      const holder = activeAllocation.assignedTo?.fullName || 'another employee'
+      const error = problem(`${asset.name} (${asset.assetTag}) is currently held by ${holder}.`, 409)
+      error.conflict = { allocationId: activeAllocation._id, assetTag: asset.assetTag, assetName: asset.name, currentHolder: holder }
+      throw error
+    }
+    if (asset.status !== 'available') throw problem('This asset is not available for allocation.')
     const allocation = await Allocation.create({ asset: asset._id, assignedTo: employee._id, assignedBy: user._id, department: data.department || employee.department, location: data.location || asset.location, expectedReturnDate: data.expectedReturnDate, notes: data.notes, status: 'active' })
     asset.status = 'allocated'
     await asset.save()

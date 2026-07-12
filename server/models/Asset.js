@@ -15,7 +15,7 @@ const assetSchema = new mongoose.Schema({
   image: { type: String, default: '' },
   documents: [{ type: String, trim: true }],
   shared: { type: Boolean, default: false },
-  status: { type: String, enum: ['available', 'allocated', 'unassigned', 'maintenance', 'retired', 'disposed', 'lost'], default: 'unassigned' },
+  status: { type: String, enum: ['available', 'allocated', 'reserved', 'unassigned', 'maintenance', 'retired', 'disposed', 'lost'], default: 'unassigned' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true })
 

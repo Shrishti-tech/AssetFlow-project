@@ -27,6 +27,9 @@ export const allocationController = {
       const allocation = await allocationService.create(req.body, req.user);
       res.status(201).json(allocation);
     } catch (error) {
+      if (error.conflict) {
+        return res.status(error.status || 409).json({ message: error.message, conflict: error.conflict });
+      }
       next(error);
     }
   },

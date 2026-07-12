@@ -1,2 +1,2 @@
-import AddCategory from './AddCategory'
-export default function EditCategory(props) { return <AddCategory {...props} /> }
+import CategoryForm from './CategoryForm'
+export default function EditCategory(props) { return <CategoryForm {...props} /> }
