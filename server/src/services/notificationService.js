@@ -7,9 +7,16 @@ const triggerText = {
   "Booking Cancelled": "Booking cancelled",
   "Booking Reminder": "Booking reminder",
   "Booking Completed": "Booking completed",
+  "Maintenance Request Raised": "Maintenance request raised",
+  "Maintenance Approved": "Maintenance approved",
+  "Maintenance Rejected": "Maintenance rejected",
+  "Technician Assigned": "Technician assigned",
+  "Repair Started": "Repair started",
+  "Repair Completed": "Repair completed",
 };
 
 const bookingLabel = (booking) => booking?.purpose || "Resource booking";
+const maintenanceLabel = (maintenance) => maintenance?.issue || "Maintenance request";
 
 export const notificationService = {
   async list(query = {}) {
@@ -42,6 +49,24 @@ export const notificationService = {
       booking: booking._id,
       user: booking.employee,
       recipient: booking.employee,
+    });
+  },
+
+  async createForMaintenance(trigger, maintenance, extraMessage = "") {
+    if (!maintenance?._id) return null;
+    const title = triggerText[trigger] || trigger;
+    const message =
+      extraMessage ||
+      `${maintenanceLabel(maintenance)} was ${title.toLowerCase()}.`;
+
+    return Notification.create({
+      trigger,
+      title,
+      message,
+      maintenance: maintenance._id,
+      user: maintenance.requestedBy,
+      recipient: maintenance.requestedBy,
+      type: trigger.includes("Rejected") ? "warning" : "info",
     });
   },
 

@@ -11,6 +11,12 @@ const triggers = [
   "Booking Cancelled",
   "Booking Reminder",
   "Booking Completed",
+  "Maintenance Request Raised",
+  "Maintenance Approved",
+  "Maintenance Rejected",
+  "Technician Assigned",
+  "Repair Started",
+  "Repair Completed",
 ];
 
 export default function Notifications() {

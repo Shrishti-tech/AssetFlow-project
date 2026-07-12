@@ -147,8 +147,9 @@ auth-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(320
 .booking-form-card h2 { margin-bottom: 16px; font-size: 22px; }
 .booking-form { display: grid; gap: 14px; }
 .booking-form label { display: grid; gap: 7px; color: #2d3a4f; font-size: 13px; font-weight: 800; }
-.booking-form input, .booking-form textarea { width: 100%; border: 1px solid #d5e0eb; border-radius: 8px; background: #fff; color: #17253a; padding: 11px 12px; outline: none; }
-.booking-form input:focus, .booking-form textarea:focus { border-color: #087ea4; box-shadow: 0 0 0 3px rgba(8, 126, 164, .13); }
+.booking-form input, .booking-form textarea, .booking-form select, .booking-calendar-toolbar select { width: 100%; border: 1px solid #d5e0eb; border-radius: 8px; background: #fff; color: #17253a; padding: 11px 12px; outline: none; }
+.booking-calendar-toolbar select { width: auto; min-height: 36px; padding: 0 12px; }
+.booking-form input:focus, .booking-form textarea:focus, .booking-form select:focus { border-color: #087ea4; box-shadow: 0 0 0 3px rgba(8, 126, 164, .13); }
 .booking-form textarea { resize: vertical; }
 .booking-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .booking-submit { min-height: 44px; border: 0; border-radius: 8px; background: #14213d; color: #fff; font-weight: 800; cursor: pointer; }

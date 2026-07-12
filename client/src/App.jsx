@@ -13,6 +13,9 @@ import BookingHistory from "./pages/booking/BookingHistory";
 import BookingCalendar from "./pages/booking/BookingCalendar";
 import RaiseRequest from "./pages/maintenance/RaiseRequest";
 import MaintenanceList from "./pages/maintenance/MaintenanceList";
+import MaintenanceDetails from "./pages/maintenance/MaintenanceDetails";
+import TechnicianAssignment from "./pages/maintenance/TechnicianAssignment";
+import MaintenanceHistory from "./pages/maintenance/MaintenanceHistory";
 import AllocateAsset from "./pages/allocation/AllocateAsset";
 import TransferAsset from "./pages/allocation/TransferAsset";
 import AllocationList from "./pages/allocation/AllocationList";
@@ -49,6 +52,9 @@ export default function App() {
           <Route path="/bookings/new" element={<ProtectedRoute><BookResource /></ProtectedRoute>} />
           <Route path="/maintenance" element={<ProtectedRoute><MaintenanceList /></ProtectedRoute>} />
           <Route path="/maintenance/new" element={<ProtectedRoute><RaiseRequest /></ProtectedRoute>} />
+          <Route path="/maintenance/history" element={<ProtectedRoute><MaintenanceHistory /></ProtectedRoute>} />
+          <Route path="/maintenance/:id" element={<ProtectedRoute><MaintenanceDetails /></ProtectedRoute>} />
+          <Route path="/maintenance/:id/assign" element={<ProtectedRoute><TechnicianAssignment /></ProtectedRoute>} />
           <Route path="/allocation" element={<ProtectedRoute><AllocateAsset /></ProtectedRoute>} />
           <Route path="/allocations" element={<ProtectedRoute><AllocationList /></ProtectedRoute>} />
           <Route path="/allocations/history" element={<ProtectedRoute><AllocationHistory /></ProtectedRoute>} />
