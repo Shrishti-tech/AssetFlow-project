@@ -1,23 +1,47 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useState } from 'react'
+import { api } from '../../auth/services/authService'
+import { useAuth } from '../../auth/hooks/useAuth'
 
 const AssetContext = createContext(null)
-const storageKey = 'assetflow-assets'
-const seed = [{ id: 'asset-1001', name: 'Dell Latitude 7420', category: 'Laptop', assetTag: 'AF-1001', serialNumber: 'DL7420-9X', acquisitionDate: '2025-08-12', acquisitionCost: '98000', condition: 'Good', location: 'Floor 3, Room 301', department: 'IT', shared: false, status: 'Allocated', documents: [], history: [{ title: 'Asset registered', date: '12 Aug 2025', detail: 'Added to IT inventory.' }] }]
+const capitalize = (value = '') => value ? value.charAt(0).toUpperCase() + value.slice(1) : value
 
-const readAssets = () => { try { return JSON.parse(localStorage.getItem(storageKey)) || seed } catch { return seed } }
-const tagFor = () => `AF-${String(Date.now()).slice(-6)}`
+const normalize = (asset) => {
+  const history = []
+  if (asset.updatedAt && asset.updatedAt !== asset.createdAt) history.push({ title: 'Asset updated', date: new Date(asset.updatedAt).toLocaleDateString(), detail: 'Asset details were updated.' })
+  if (asset.createdAt) history.push({ title: 'Asset registered', date: new Date(asset.createdAt).toLocaleDateString(), detail: `Added to the ${asset.department || 'asset'} inventory.` })
+  return { ...asset, id: asset._id, status: capitalize(asset.status), history }
+}
+
+const sanitize = (data) => {
+  const payload = { ...data }
+  delete payload.id; delete payload._id; delete payload.assetTag; delete payload.history; delete payload.createdBy; delete payload.createdAt; delete payload.updatedAt
+  if (!payload.serialNumber) delete payload.serialNumber
+  if (!payload.acquisitionDate) delete payload.acquisitionDate
+  payload.acquisitionCost = payload.acquisitionCost === '' || payload.acquisitionCost === undefined ? undefined : Number(payload.acquisitionCost)
+  if (payload.acquisitionCost === undefined) delete payload.acquisitionCost
+  if (payload.status) payload.status = payload.status.toLowerCase()
+  return payload
+}
 
 export function AssetProvider({ children }) {
-  const [assets, setAssets] = useState(readAssets)
-  useEffect(() => localStorage.setItem(storageKey, JSON.stringify(assets)), [assets])
+  const { user } = useAuth()
+  const [assets, setAssets] = useState([])
+  const [nextTag] = useState(() => `AF-${String(Date.now()).slice(-6)}`)
+
+  const load = async () => {
+    try { const { data } = await api.get('/assets', { params: { limit: 100 } }); setAssets(data.assets.map(normalize)) }
+    catch { setAssets([]) }
+  }
+  useEffect(() => { if (user) load(); else setAssets([]) }, [user])
+
   const value = useMemo(() => ({
     assets,
-    create: (data) => { const asset = { ...data, id: crypto.randomUUID(), assetTag: tagFor(), status: data.shared ? 'Available' : 'Unassigned', history: [{ title: 'Asset registered', date: new Date().toLocaleDateString(), detail: 'Added to the asset directory.' }] }; setAssets((items) => [asset, ...items]); return asset },
-    update: (id, data) => setAssets((items) => items.map((asset) => asset.id === id ? { ...asset, ...data, history: [{ title: 'Asset updated', date: new Date().toLocaleDateString(), detail: 'Asset details were updated.' }, ...(asset.history || [])] } : asset)),
-    remove: (id) => setAssets((items) => items.filter((asset) => asset.id !== id)),
+    nextTag,
+    create: async (data) => { const { data: res } = await api.post('/assets', sanitize(data)); await load(); return normalize(res.asset) },
+    update: async (id, data) => { const { data: res } = await api.put(`/assets/${id}`, sanitize(data)); await load(); return normalize(res.asset) },
+    remove: async (id) => { await api.delete(`/assets/${id}`); await load() },
     get: (id) => assets.find((asset) => asset.id === id),
-    nextTag: tagFor(),
-  }), [assets])
+  }), [assets, nextTag])
   return createElement(AssetContext.Provider, { value }, children)
 }
 export const useAssets = () => useContext(AssetContext)
