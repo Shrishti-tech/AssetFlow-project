@@ -10,3 +10,7 @@ Database: MongoDB / PostgreSQL / MySQL
 Authentication: JWT + Role-Based Access Control
 Cloud Storage: AWS S3 / Firebase Storage
 Notifications: Email, SMS, Push Notifications
+
+## Authentication module
+
+The app includes employee-only self-registration, bcrypt password hashing, HttpOnly JWT cookie sessions, protected routes, role middleware, and password reset tokens. Copy `server/.env.example` to `server/.env`, provide a MongoDB connection string and a long JWT secret, then run `npm install`, `npm run server`, and `npm run client`.

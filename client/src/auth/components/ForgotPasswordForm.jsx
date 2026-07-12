@@ -1,0 +1,3 @@
+import { useState } from 'react'
+import { isValidEmail } from '../utils/authHelpers'
+export default function ForgotPasswordForm({ onSubmit, busy }) { const [email, setEmail] = useState(''); const [error, setError] = useState(''); const submit = (e) => { e.preventDefault(); if (!isValidEmail(email)) return setError('Enter a valid email address.'); setError(''); onSubmit({ email }) }; return <form onSubmit={submit}><label>Registered email<input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />{error && <em>{error}</em>}</label><button className="primary-button" disabled={busy}>{busy ? <i className="spinner" /> : 'Send reset link'}</button></form> }
