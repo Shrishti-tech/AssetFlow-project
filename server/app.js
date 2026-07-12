@@ -7,6 +7,7 @@ import { bookingRoutes } from "./src/routes/bookingRoutes.js";
 import { departmentRoutes } from "./routes/departmentRoutes.js";
 import { categoryRoutes } from "./routes/categoryRoutes.js";
 import { employeeRoutes } from "./routes/employeeRoutes.js";
+import { assetRoutes } from "./routes/assetRoutes.js";
 
 export const app = express();
 app.use(
@@ -24,7 +25,19 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/assets", assetRoutes);
 app.use((error, _req, res, _next) => {
   console.error(error);
+  if (error.name === "ValidationError") {
+    return res.status(400).json({ message: error.message });
+  }
+  if (error.code === 11000) {
+    return res
+      .status(409)
+      .json({ message: "An asset with this unique value already exists." });
+  }
+  if (error.name === "CastError") {
+    return res.status(400).json({ message: "Invalid resource ID." });
+  }
   res.status(500).json({ message: "Something went wrong. Please try again." });
 });
