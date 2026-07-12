@@ -30,16 +30,17 @@ const transferRequestSchema = new mongoose.Schema(
     reason: { type: String, trim: true },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected", "completed"],
-      default: "pending",
+      enum: ["requested", "approved", "rejected", "completed"],
+      default: "requested",
     },
     requestedAt: { type: Date, default: Date.now },
+    transferDate: { type: Date, default: Date.now },
     reviewedAt: { type: Date },
   },
   { timestamps: true },
 );
 
-export const TransferRequest = mongoose.model(
+export const TransferRequest = mongoose.models.TransferRequest || mongoose.model(
   "TransferRequest",
   transferRequestSchema,
 );

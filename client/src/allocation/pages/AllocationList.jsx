@@ -1,27 +1,15 @@
-import { useEffect, useState } from "react";
-import { getAllocations } from "../services/allocationService";
-import AllocationTable from "../components/AllocationTable";
-
+import { useEffect, useState } from 'react'
+import AllocationTable from '../components/AllocationTable'
+import ReturnModal from '../components/ReturnModal'
+import TransferModal from '../components/TransferModal'
+import { createTransferRequest, getAllocationOptions, getAllocations, returnAllocation } from '../services/allocationService'
+import '../../pages/allocation/allocation.css'
 export default function AllocationList() {
-  const [allocations, setAllocations] = useState([]);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getAllocations();
-        setAllocations(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    load();
-  }, []);
-
-  return (
-    <div className="allocation-page">
-      <h2>Allocations</h2>
-      <AllocationTable allocations={allocations} />
-    </div>
-  );
+  const [items, setItems] = useState([]), [options, setOptions] = useState({ employees: [], departments: [] }), [filters, setFilters] = useState({ search: '', department: '', status: '', allocationDate: '', returnDate: '' }), [selected, setSelected] = useState(null), [mode, setMode] = useState(''), [message, setMessage] = useState(''), [busy, setBusy] = useState(false)
+  const load = async () => { const [records, nextOptions] = await Promise.all([getAllocations(filters), getAllocationOptions()]); setItems(records); setOptions(nextOptions) }
+  useEffect(() => { load().catch((error) => setMessage(error.response?.data?.message || 'Unable to load allocations.')) }, [filters.search, filters.department, filters.status, filters.allocationDate, filters.returnDate])
+  const set = (key, value) => setFilters((current) => ({ ...current, [key]: value }))
+  const transfer = async (data) => { try { setBusy(true); await createTransferRequest(data); setMessage('Transfer request submitted.'); setMode(''); await load() } catch (error) { setMessage(error.response?.data?.message || 'Unable to submit transfer.') } finally { setBusy(false) } }
+  const returnAsset = async (id, data) => { try { setBusy(true); await returnAllocation(id, data); setMessage('Asset returned and marked available.'); setMode(''); await load() } catch (error) { setMessage(error.response?.data?.message || 'Unable to return asset.') } finally { setBusy(false) } }
+  return <main className="allocation-page"><h1>Asset allocations</h1><p>Search, filter, transfer, or return current allocations.</p>{message && <div className="allocation-message">{message}</div>}<section className="allocation-card allocation-filters"><input placeholder="Asset tag, asset name, or employee" value={filters.search} onChange={(event) => set('search', event.target.value)} /><select value={filters.department} onChange={(event) => set('department', event.target.value)}><option value="">All departments</option>{options.departments.map((item) => <option key={item}>{item}</option>)}</select><select value={filters.status} onChange={(event) => set('status', event.target.value)}><option value="">All statuses</option><option value="active">Allocated</option><option value="overdue">Overdue</option><option value="returned">Available / returned</option></select><label>Allocated<input type="date" value={filters.allocationDate} onChange={(event) => set('allocationDate', event.target.value)} /></label><label>Return<input type="date" value={filters.returnDate} onChange={(event) => set('returnDate', event.target.value)} /></label></section><AllocationTable allocations={items} onView={(item) => setMessage(`${item.asset?.assetTag}: assigned to ${item.assignedTo?.fullName}; notes: ${item.notes || 'None'}`)} onTransfer={(item) => { setSelected(item); setMode('transfer') }} onReturn={(item) => { setSelected(item); setMode('return') }} /><TransferModal open={mode === 'transfer'} allocation={selected} employees={options.employees} busy={busy} onClose={() => setMode('')} onSubmit={transfer} /><ReturnModal open={mode === 'return'} allocation={selected} busy={busy} onClose={() => setMode('')} onSubmit={returnAsset} /></main>
 }

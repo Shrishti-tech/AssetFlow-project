@@ -1,95 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react'
 
-const defaultValues = {
-  asset: "",
-  assignedTo: "",
-  assignedBy: "",
-  department: "",
-  location: "",
-  notes: "",
-};
+const blank = { asset: '', assignedTo: '', department: '', expectedReturnDate: '', notes: '' }
+const today = new Date().toISOString().slice(0, 10)
 
-export default function AllocationForm({
-  initialValues = {},
-  onSubmit,
-  submitLabel = "Create Allocation",
-}) {
-  const [form, setForm] = useState({ ...defaultValues, ...initialValues });
-
-  const updateField = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onSubmit?.(form);
-  };
-
-  return (
-    <form className="allocation-form" onSubmit={handleSubmit}>
-      <label>
-        <span>Asset ID</span>
-        <input
-          value={form.asset}
-          onChange={(event) => updateField("asset", event.target.value)}
-          placeholder="Asset ID"
-          required
-        />
-      </label>
-
-      <label>
-        <span>Assigned To</span>
-        <input
-          value={form.assignedTo}
-          onChange={(event) => updateField("assignedTo", event.target.value)}
-          placeholder="User ID"
-          required
-        />
-      </label>
-
-      <label>
-        <span>Assigned By</span>
-        <input
-          value={form.assignedBy}
-          onChange={(event) => updateField("assignedBy", event.target.value)}
-          placeholder="User ID"
-          required
-        />
-      </label>
-
-      <label>
-        <span>Department</span>
-        <input
-          value={form.department}
-          onChange={(event) => updateField("department", event.target.value)}
-          placeholder="IT"
-        />
-      </label>
-
-      <label>
-        <span>Location</span>
-        <input
-          value={form.location}
-          onChange={(event) => updateField("location", event.target.value)}
-          placeholder="Floor 2"
-        />
-      </label>
-
-      <label>
-        <span>Notes</span>
-        <textarea
-          value={form.notes}
-          onChange={(event) => updateField("notes", event.target.value)}
-          rows="4"
-          placeholder="Allocation notes"
-        />
-      </label>
-
-      <div className="allocation-form-actions">
-        <button type="submit" className="allocation-primary-btn">
-          {submitLabel}
-        </button>
-      </div>
-    </form>
-  );
+export default function AllocationForm({ assets = [], employees = [], departments = [], onSubmit, busy }) {
+  const [form, setForm] = useState(blank)
+  const [error, setError] = useState('')
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }))
+  useEffect(() => {
+    const employee = employees.find((item) => item._id === form.assignedTo)
+    if (employee?.department) update('department', employee.department)
+  }, [form.assignedTo])
+  const submit = async (event) => {
+    event.preventDefault()
+    if (!form.asset || !form.assignedTo || !form.expectedReturnDate) return setError('Asset, employee, and expected return date are required.')
+    if (form.expectedReturnDate < today) return setError('Expected return date cannot be before today.')
+    setError('')
+    const saved = await onSubmit(form)
+    if (saved) setForm(blank)
+  }
+  return <form className="allocation-form" onSubmit={submit}>
+    {error && <p className="allocation-error">{error}</p>}
+    <label>Asset<select value={form.asset} onChange={(event) => update('asset', event.target.value)} required><option value="">Select an available asset</option>{assets.map((asset) => <option value={asset._id} key={asset._id}>{asset.assetTag} — {asset.name}</option>)}</select></label>
+    <label>Employee<select value={form.assignedTo} onChange={(event) => update('assignedTo', event.target.value)} required><option value="">Select an employee</option>{employees.map((employee) => <option value={employee._id} key={employee._id}>{employee.fullName} {employee.department ? `(${employee.department})` : ''}</option>)}</select></label>
+    <label>Department<select value={form.department} onChange={(event) => update('department', event.target.value)}><option value="">Select department</option>{departments.map((department) => <option key={department}>{department}</option>)}</select></label>
+    <label>Expected return date<input type="date" min={today} value={form.expectedReturnDate} onChange={(event) => update('expectedReturnDate', event.target.value)} required /></label>
+    <label>Notes / remarks<textarea value={form.notes} onChange={(event) => update('notes', event.target.value)} placeholder="Optional allocation notes" /></label>
+    <div className="allocation-form-actions"><button type="reset" className="allocation-btn allocation-btn--secondary" onClick={() => { setForm(blank); setError('') }}>Reset</button><button disabled={busy} className="allocation-primary-btn">{busy ? 'Allocating…' : 'Allocate asset'}</button></div>
+  </form>
 }

@@ -1,91 +1,10 @@
-import { useState } from "react";
-
-export default function TransferModal({ open, onClose, onSubmit }) {
-  const [form, setForm] = useState({
-    asset: "",
-    toUser: "",
-    toDepartment: "",
-    reason: "",
-  });
-
-  if (!open) return null;
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onSubmit?.(form);
-    onClose?.();
-  };
-
-  return (
-    <div className="allocation-modal-backdrop">
-      <div className="allocation-modal">
-        <h3>Transfer Request</h3>
-        <form onSubmit={handleSubmit} className="allocation-form">
-          <label>
-            <span>Asset ID</span>
-            <input
-              value={form.asset}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  asset: event.target.value,
-                }))
-              }
-              required
-            />
-          </label>
-          <label>
-            <span>Transfer To User</span>
-            <input
-              value={form.toUser}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  toUser: event.target.value,
-                }))
-              }
-              required
-            />
-          </label>
-          <label>
-            <span>Transfer To Department</span>
-            <input
-              value={form.toDepartment}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  toDepartment: event.target.value,
-                }))
-              }
-            />
-          </label>
-          <label>
-            <span>Reason</span>
-            <textarea
-              value={form.reason}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  reason: event.target.value,
-                }))
-              }
-              rows="3"
-            />
-          </label>
-          <div className="allocation-form-actions">
-            <button
-              type="button"
-              className="allocation-btn allocation-btn--secondary"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="allocation-primary-btn">
-              Submit Request
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+import { useEffect, useState } from 'react'
+const today = new Date().toISOString().slice(0, 10)
+export default function TransferModal({ allocation, employees = [], open, onClose, onSubmit, busy }) {
+  const [form, setForm] = useState({ toUser: '', toDepartment: '', reason: '', transferDate: today })
+  useEffect(() => { if (allocation) setForm({ toUser: '', toDepartment: '', reason: '', transferDate: today }) }, [allocation])
+  if (!open || !allocation) return null
+  const change = (key, value) => setForm((current) => ({ ...current, [key]: value }))
+  const submit = async (event) => { event.preventDefault(); if (!window.confirm('Are you sure you want to submit this transfer request?')) return; await onSubmit({ allocation: allocation._id, ...form }); }
+  return <div className="allocation-modal-backdrop"><form className="allocation-modal allocation-form" onSubmit={submit}><h3>Transfer request</h3><p>Current holder: <b>{allocation.assignedTo?.fullName}</b></p><label>New holder<select required value={form.toUser} onChange={(event) => { const employee = employees.find((item) => item._id === event.target.value); change('toUser', event.target.value); if (employee?.department) change('toDepartment', employee.department) }}><option value="">Select employee</option>{employees.filter((item) => item._id !== allocation.assignedTo?._id).map((item) => <option key={item._id} value={item._id}>{item.fullName}</option>)}</select></label><label>Department<input value={form.toDepartment} onChange={(event) => change('toDepartment', event.target.value)} /></label><label>Reason<textarea required value={form.reason} onChange={(event) => change('reason', event.target.value)} /></label><label>Transfer date<input type="date" min={today} required value={form.transferDate} onChange={(event) => change('transferDate', event.target.value)} /></label><div className="allocation-form-actions"><button type="button" onClick={onClose}>Cancel</button><button disabled={busy}>Submit request</button></div></form></div>
 }

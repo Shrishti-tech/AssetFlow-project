@@ -1,37 +1,5 @@
-import { useEffect, useState } from "react";
-import { getAllocationHistory } from "../services/allocationService";
-
-export default function AllocationHistory() {
-  const [history, setHistory] = useState([]);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getAllocationHistory();
-        setHistory(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    load();
-  }, []);
-
-  return (
-    <div className="allocation-page">
-      <h2>Allocation History</h2>
-      <div className="allocation-history-list">
-        {history.length === 0 ? (
-          <p>No history available.</p>
-        ) : (
-          history.map((item, index) => (
-            <div key={item._id || index} className="allocation-history-item">
-              <strong>{item.action || "Event"}</strong>
-              <p>{item.details || item.notes || "No details"}</p>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
+import { useEffect, useState } from 'react'
+import { getAllocationHistory } from '../services/allocationService'
+import '../../pages/allocation/allocation.css'
+const labels = { allocated: 'Allocated', transfer_requested: 'Transfer requested', transfer_approved: 'Transfer approved', transferred: 'Transferred', transfer_rejected: 'Transfer rejected', returned: 'Returned', updated: 'Updated' }
+export default function AllocationHistory() { const [history, setHistory] = useState([]), [error, setError] = useState(''); useEffect(() => { getAllocationHistory().then(setHistory).catch((err) => setError(err.response?.data?.message || 'Unable to load allocation history.')) }, []); return <main className="allocation-page"><h1>Allocation history</h1><p>Every allocation, transfer request, approval, transfer, and return.</p>{error && <div className="allocation-error">{error}</div>}<section className="allocation-card allocation-timeline">{history.length ? history.map((item) => <article key={item._id}><span /><div><b>{labels[item.action] || item.action}</b><p>{item.allocation?.asset?.name || 'Asset'} · {new Date(item.createdAt).toLocaleString()}</p><small>{item.performedBy?.fullName || 'System'}</small></div></article>) : <p>No allocation history yet.</p>}</section></main> }

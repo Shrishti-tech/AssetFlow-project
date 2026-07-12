@@ -37,10 +37,17 @@ const allocationSchema = new mongoose.Schema(
     allocatedAt: { type: Date, default: Date.now },
     expectedReturnDate: { type: Date },
     returnedAt: { type: Date },
+    returnCondition: {
+      type: String,
+      enum: ["Excellent", "Good", "Fair", "Damaged"],
+    },
+    damageNotes: { type: String, trim: true, maxlength: 1000 },
     notes: { type: String, trim: true },
   },
   { timestamps: true },
 );
 
-export const Allocation = mongoose.model("Allocation", allocationSchema);
+allocationSchema.index({ asset: 1, status: 1 });
+
+export const Allocation = mongoose.models.Allocation || mongoose.model("Allocation", allocationSchema);
 export default Allocation;

@@ -10,7 +10,7 @@ const allocationHistorySchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["created", "updated", "returned", "transferred", "status_changed"],
+      enum: ["allocated", "transfer_requested", "transfer_approved", "transferred", "transfer_rejected", "returned", "updated"],
       required: true,
     },
     performedBy: {
@@ -23,7 +23,7 @@ const allocationHistorySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const AllocationHistory = mongoose.model(
+export const AllocationHistory = mongoose.models.AllocationHistory || mongoose.model(
   "AllocationHistory",
   allocationHistorySchema,
 );

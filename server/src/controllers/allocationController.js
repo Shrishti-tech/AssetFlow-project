@@ -24,7 +24,7 @@ export const allocationController = {
 
   async create(req, res, next) {
     try {
-      const allocation = await allocationService.create(req.body);
+      const allocation = await allocationService.create(req.body, req.user);
       res.status(201).json(allocation);
     } catch (error) {
       next(error);
@@ -36,6 +36,7 @@ export const allocationController = {
       const allocation = await allocationService.update(
         req.params.id,
         req.body,
+        req.user,
       );
       if (!allocation) {
         return res.status(404).json({ message: "Allocation not found." });
@@ -63,6 +64,7 @@ export const allocationController = {
       const allocation = await allocationService.returnAllocation(
         req.params.id,
         req.body,
+        req.user,
       );
       if (!allocation) {
         return res.status(404).json({ message: "Allocation not found." });
@@ -75,7 +77,7 @@ export const allocationController = {
 
   async requestTransfer(req, res, next) {
     try {
-      const transferRequest = await allocationService.requestTransfer(req.body);
+      const transferRequest = await allocationService.requestTransfer(req.body, req.user);
       res.status(201).json(transferRequest);
     } catch (error) {
       next(error);
@@ -87,6 +89,7 @@ export const allocationController = {
       const transferRequest = await allocationService.approveTransfer(
         req.params.id,
         req.body,
+        req.user,
       );
       if (!transferRequest) {
         return res.status(404).json({ message: "Transfer request not found." });
@@ -102,6 +105,7 @@ export const allocationController = {
       const transferRequest = await allocationService.rejectTransfer(
         req.params.id,
         req.body,
+        req.user,
       );
       if (!transferRequest) {
         return res.status(404).json({ message: "Transfer request not found." });
@@ -114,11 +118,21 @@ export const allocationController = {
 
   async history(req, res, next) {
     try {
-      const history = await allocationService.getHistory(req.params.id);
+      const history = await allocationService.getHistory(req.params.id || req.query.allocation);
       res.json(history);
     } catch (error) {
       next(error);
     }
+  },
+
+  async options(_req, res, next) {
+    try { res.json(await allocationService.getOptions()) } catch (error) { next(error) }
+  },
+
+  async listTransfers(_req, res, next) {
+    try {
+      res.json(await allocationService.listTransfers());
+    } catch (error) { next(error) }
   },
 
   async summary(req, res, next) {
