@@ -3,7 +3,7 @@ import maintenanceService from "../services/maintenanceService.js";
 export const maintenanceController = {
   async create(req, res, next) {
     try {
-      const maintenance = await maintenanceService.create(req.body, req.user);
+      const maintenance = await maintenanceService.create(req.body, req.user, req.ip);
       res.status(201).json(maintenance);
     } catch (error) {
       next(error);
@@ -31,7 +31,7 @@ export const maintenanceController = {
 
   async approve(req, res, next) {
     try {
-      const request = await maintenanceService.approve(req.params.id, req.body, req.user);
+      const request = await maintenanceService.approve(req.params.id, req.body, req.user, req.ip);
       if (!request) return res.status(404).json({ message: "Maintenance request not found." });
       return res.json(request);
     } catch (error) {
@@ -41,7 +41,7 @@ export const maintenanceController = {
 
   async reject(req, res, next) {
     try {
-      const request = await maintenanceService.reject(req.params.id, req.body, req.user);
+      const request = await maintenanceService.reject(req.params.id, req.body, req.user, req.ip);
       if (!request) return res.status(404).json({ message: "Maintenance request not found." });
       return res.json(request);
     } catch (error) {
@@ -51,7 +51,7 @@ export const maintenanceController = {
 
   async assign(req, res, next) {
     try {
-      const request = await maintenanceService.assignTechnician(req.params.id, req.body, req.user);
+      const request = await maintenanceService.assignTechnician(req.params.id, req.body, req.user, req.ip);
       if (!request) return res.status(404).json({ message: "Maintenance request not found." });
       return res.json(request);
     } catch (error) {
@@ -61,7 +61,7 @@ export const maintenanceController = {
 
   async start(req, res, next) {
     try {
-      const request = await maintenanceService.startRepair(req.params.id, req.body, req.user);
+      const request = await maintenanceService.startRepair(req.params.id, req.body, req.user, req.ip);
       if (!request) return res.status(404).json({ message: "Maintenance request not found." });
       return res.json(request);
     } catch (error) {
@@ -71,7 +71,7 @@ export const maintenanceController = {
 
   async complete(req, res, next) {
     try {
-      const request = await maintenanceService.completeRepair(req.params.id, req.body, req.user);
+      const request = await maintenanceService.completeRepair(req.params.id, req.body, req.user, req.ip);
       if (!request) return res.status(404).json({ message: "Maintenance request not found." });
       return res.json(request);
     } catch (error) {

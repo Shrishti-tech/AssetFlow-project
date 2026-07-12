@@ -33,7 +33,9 @@ import AuditVerification from "./pages/audit/AuditVerification";
 import DiscrepancyReport from "./pages/audit/DiscrepancyReport";
 import AuditHistory from "./pages/audit/AuditHistory";
 import Profile from "./pages/profile/Profile";
-import Notifications from "./pages/notifications/Notifications";
+import NotificationCenter from "./pages/notifications/NotificationCenter";
+import ActivityLogs from "./pages/notifications/ActivityLogs";
+import ReminderCenter from "./pages/notifications/ReminderCenter";
 import { OrganizationSetup } from "./organization";
 import HelpSupport from "./help/HelpSupport";
 import "./styles.css";
@@ -82,7 +84,9 @@ export default function App() {
           <Route path="/audits/:id/assign" element={<ProtectedRoute><AssignAuditor /></ProtectedRoute>} />
           <Route path="/audits/:id/verify" element={<ProtectedRoute><AuditVerification /></ProtectedRoute>} />
           <Route path="/audits/:id/report" element={<ProtectedRoute><DiscrepancyReport /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationCenter /></ProtectedRoute>} />
+          <Route path="/activity" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
+          <Route path="/reminders" element={<ProtectedRoute><ReminderCenter /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
           <Route path="/help" element={<ProtectedRoute><HelpSupport /></ProtectedRoute>} />

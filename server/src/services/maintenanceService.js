@@ -3,7 +3,7 @@ import { Asset } from "../models/Asset.js";
 import { Maintenance } from "../models/Maintenance.js";
 import { MaintenanceHistory } from "../models/MaintenanceHistory.js";
 import { Technician } from "../models/Technician.js";
-import notificationService from "./notificationService.js";
+import notificationService, { activityLogService } from "./notificationService.js";
 
 const openStatuses = ["Pending", "Approved", "Technician Assigned", "In Progress"];
 const assetMaintenanceStatus = "maintenance";
@@ -41,7 +41,7 @@ export const maintenanceService = {
     return populateMaintenance(Maintenance.findById(id));
   },
 
-  async create(data, user) {
+  async create(data, user, ipAddress) {
     const asset = await Asset.findById(data.asset);
     if (!asset) fail("Asset must exist.", 404);
 
@@ -77,10 +77,18 @@ export const maintenanceService = {
       "Maintenance Request Raised",
       maintenance,
     );
+    await activityLogService.log({
+      user: user._id,
+      action: "Maintenance Request Raised",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Raised a maintenance request for ${asset.name} (${asset.assetTag}).`,
+      ipAddress,
+    });
     return this.getById(maintenance._id);
   },
 
-  async approve(id, data, user) {
+  async approve(id, data, user, ipAddress) {
     const maintenance = await Maintenance.findById(id);
     if (!maintenance) return null;
     if (maintenance.status !== "Pending") fail("Only pending requests can be approved.");
@@ -99,10 +107,18 @@ export const maintenanceService = {
 
     await createHistory(maintenance._id, "Approved", user._id, { data });
     await notificationService.createForMaintenance("Maintenance Approved", maintenance);
+    await activityLogService.log({
+      user: user._id,
+      action: "Maintenance Approved",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Approved maintenance request for ${asset.name} (${asset.assetTag}).`,
+      ipAddress,
+    });
     return this.getById(id);
   },
 
-  async reject(id, data, user) {
+  async reject(id, data, user, ipAddress) {
     const maintenance = await Maintenance.findById(id);
     if (!maintenance) return null;
     if (maintenance.status !== "Pending") fail("Only pending requests can be rejected.");
@@ -115,10 +131,18 @@ export const maintenanceService = {
 
     await createHistory(maintenance._id, "Rejected", user._id, { data });
     await notificationService.createForMaintenance("Maintenance Rejected", maintenance);
+    await activityLogService.log({
+      user: user._id,
+      action: "Maintenance Rejected",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Rejected maintenance request.`,
+      ipAddress,
+    });
     return this.getById(id);
   },
 
-  async assignTechnician(id, data, user) {
+  async assignTechnician(id, data, user, ipAddress) {
     const maintenance = await Maintenance.findById(id);
     if (!maintenance) return null;
     if (maintenance.status !== "Approved") {
@@ -144,10 +168,18 @@ export const maintenanceService = {
       remarks: data.remarks,
     });
     await notificationService.createForMaintenance("Technician Assigned", maintenance);
+    await activityLogService.log({
+      user: user._id,
+      action: "Technician Assigned",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Assigned technician ${technician.name} to maintenance request.`,
+      ipAddress,
+    });
     return this.getById(id);
   },
 
-  async startRepair(id, data, user) {
+  async startRepair(id, data, user, ipAddress) {
     const maintenance = await Maintenance.findById(id);
     if (!maintenance) return null;
     if (maintenance.status !== "Technician Assigned") {
@@ -160,10 +192,18 @@ export const maintenanceService = {
 
     await createHistory(maintenance._id, "Repair Started", user._id, { data });
     await notificationService.createForMaintenance("Repair Started", maintenance);
+    await activityLogService.log({
+      user: user._id,
+      action: "Repair Started",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Repair started on maintenance request.`,
+      ipAddress,
+    });
     return this.getById(id);
   },
 
-  async completeRepair(id, data, user) {
+  async completeRepair(id, data, user, ipAddress) {
     const maintenance = await Maintenance.findById(id);
     if (!maintenance) return null;
     if (maintenance.status !== "In Progress") {
@@ -189,6 +229,14 @@ export const maintenanceService = {
 
     await createHistory(maintenance._id, "Completed", user._id, { data });
     await notificationService.createForMaintenance("Repair Completed", maintenance);
+    await activityLogService.log({
+      user: user._id,
+      action: "Repair Completed",
+      module: "Maintenance",
+      resourceId: maintenance._id,
+      description: `Repair completed${asset ? ` for ${asset.name} (${asset.assetTag})` : ""}.`,
+      ipAddress,
+    });
     return this.getById(id);
   },
 

@@ -3,7 +3,8 @@ import { AllocationHistory } from '../models/AllocationHistory.js'
 import { Asset } from '../models/Asset.js'
 import { TransferRequest } from '../models/TransferRequest.js'
 import { User } from '../../models/User.js'
-import { Notification } from '../../models/Notification.js'
+import { Notification } from '../models/Notification.js'
+import notificationService, { activityLogService } from './notificationService.js'
 
 const problem = (message, status = 400) => Object.assign(new Error(message), { status })
 const populateAllocation = (query) => query.populate('asset', 'name assetTag status department').populate('assignedTo', 'fullName email department').populate('assignedBy', 'fullName email')
@@ -17,8 +18,8 @@ const asObject = (allocation) => {
 async function createOverdueNotifications() {
   const overdue = await Allocation.find({ status: 'active', expectedReturnDate: { $lt: new Date() } }).populate('asset', 'name assetTag').populate('assignedTo', 'fullName')
   await Promise.all(overdue.map((item) => Notification.updateOne(
-    { allocation: item._id },
-    { $setOnInsert: { allocation: item._id, user: item.assignedTo?._id, title: 'Asset return overdue', message: `${item.asset?.name || 'An asset'} (${item.asset?.assetTag || ''}) is overdue for return.`, type: 'warning' } },
+    { relatedModule: 'Allocation', relatedId: item._id, title: 'Asset Return Overdue' },
+    { $setOnInsert: { user: item.assignedTo?._id, relatedModule: 'Allocation', relatedId: item._id, title: 'Asset Return Overdue', message: `${item.asset?.name || 'An asset'} (${item.asset?.assetTag || ''}) is overdue for return.`, type: 'Asset', priority: 'High' } },
     { upsert: true },
   )))
 }
@@ -50,7 +51,7 @@ export const allocationService = {
     return item ? asObject(item) : null
   },
 
-  async create(data, user) {
+  async create(data, user, ipAddress) {
     const [asset, employee] = await Promise.all([Asset.findById(data.asset), User.findById(data.assignedTo)])
     if (!asset) throw problem('Asset not found.', 404)
     if (!employee || employee.status !== 'Active') throw problem('Select an active employee.')
@@ -66,6 +67,8 @@ export const allocationService = {
     asset.status = 'allocated'
     await asset.save()
     await history(allocation._id, 'allocated', user, { assetTag: asset.assetTag, employee: employee.fullName, expectedReturnDate: allocation.expectedReturnDate })
+    await notificationService.create({ user: employee._id, title: 'Asset Assigned', message: `${asset.name} (${asset.assetTag}) has been assigned to you.`, type: 'Asset', priority: 'Medium', relatedModule: 'Allocation', relatedId: allocation._id })
+    await activityLogService.log({ user: user._id, action: 'Asset Allocated', module: 'Allocation', resourceId: allocation._id, description: `Allocated ${asset.name} (${asset.assetTag}) to ${employee.fullName}.`, ipAddress })
     return this.getById(allocation._id)
   },
 
@@ -83,7 +86,7 @@ export const allocationService = {
     return allocation
   },
 
-  async returnAllocation(id, data, user) {
+  async returnAllocation(id, data, user, ipAddress) {
     const allocation = await Allocation.findById(id)
     if (!allocation) return null
     if (allocation.status === 'returned') throw problem('This allocation has already been returned.')
@@ -92,12 +95,14 @@ export const allocationService = {
     allocation.returnCondition = data.returnCondition
     allocation.damageNotes = data.damageNotes || ''
     await allocation.save()
-    await Asset.findByIdAndUpdate(allocation.asset, { status: 'available' })
+    const asset = await Asset.findByIdAndUpdate(allocation.asset, { status: 'available' })
     await history(allocation._id, 'returned', user, { returnDate: allocation.returnedAt, condition: allocation.returnCondition, damageNotes: allocation.damageNotes })
+    await notificationService.create({ user: allocation.assignedTo, title: 'Asset Returned', message: `${asset?.name || 'The asset'} (${asset?.assetTag || ''}) return has been recorded.`, type: 'Asset', priority: 'Low', relatedModule: 'Allocation', relatedId: allocation._id })
+    await activityLogService.log({ user: user._id, action: 'Asset Returned', module: 'Allocation', resourceId: allocation._id, description: `${asset?.name || 'Asset'} (${asset?.assetTag || ''}) was returned.`, ipAddress })
     return this.getById(allocation._id)
   },
 
-  async requestTransfer(data, user) {
+  async requestTransfer(data, user, ipAddress) {
     const allocation = await Allocation.findById(data.allocation)
     if (!allocation || allocation.status !== 'active') throw problem('Select an active allocation.')
     if (allocation.assignedTo.toString() === data.toUser) throw problem('The new holder must be different from the current holder.')
@@ -106,10 +111,12 @@ export const allocationService = {
     if (await TransferRequest.exists({ asset: allocation.asset, status: 'requested' })) throw problem('A transfer request is already awaiting approval.')
     const request = await TransferRequest.create({ asset: allocation.asset, requestedBy: user._id, fromUser: allocation.assignedTo, toUser: newHolder._id, fromDepartment: allocation.department, toDepartment: data.toDepartment || newHolder.department, reason: data.reason, transferDate: data.transferDate, status: 'requested' })
     await history(allocation._id, 'transfer_requested', user, { transferRequest: request._id, fromUser: allocation.assignedTo, toUser: newHolder._id, reason: data.reason })
+    await notificationService.create({ user: newHolder._id, title: 'Transfer Requested', message: `A transfer request was raised to assign an asset to you.`, type: 'Asset', priority: 'Medium', relatedModule: 'TransferRequest', relatedId: request._id })
+    await activityLogService.log({ user: user._id, action: 'Transfer Requested', module: 'Allocation', resourceId: request._id, description: `Transfer requested to ${newHolder.fullName}.`, ipAddress })
     return request
   },
 
-  async approveTransfer(id, _data, user) {
+  async approveTransfer(id, _data, user, ipAddress) {
     const request = await TransferRequest.findById(id)
     if (!request) return null
     if (request.status !== 'requested') throw problem('Only requested transfers can be approved.')
@@ -125,10 +132,12 @@ export const allocationService = {
     request.status = 'completed'
     await request.save()
     await history(allocation._id, 'transferred', user, { transferRequest: request._id, toUser: request.toUser })
+    await notificationService.create({ user: request.toUser, title: 'Transfer Approved', message: `Your asset transfer has been approved.`, type: 'Asset', priority: 'Medium', relatedModule: 'TransferRequest', relatedId: request._id })
+    await activityLogService.log({ user: user._id, action: 'Transfer Approved', module: 'Allocation', resourceId: request._id, description: `Transfer of asset to a new holder approved.`, ipAddress })
     return request
   },
 
-  async rejectTransfer(id, _data, user) {
+  async rejectTransfer(id, _data, user, ipAddress) {
     const request = await TransferRequest.findById(id)
     if (!request) return null
     if (request.status !== 'requested') throw problem('Only requested transfers can be rejected.')
@@ -137,6 +146,8 @@ export const allocationService = {
     await request.save()
     const allocation = await Allocation.findOne({ asset: request.asset, status: 'active' })
     if (allocation) await history(allocation._id, 'transfer_rejected', user, { transferRequest: request._id })
+    await notificationService.create({ user: request.requestedBy, title: 'Transfer Rejected', message: `Your asset transfer request was rejected.`, type: 'Asset', priority: 'Medium', relatedModule: 'TransferRequest', relatedId: request._id })
+    await activityLogService.log({ user: user._id, action: 'Transfer Rejected', module: 'Allocation', resourceId: request._id, description: `Transfer request rejected.`, ipAddress })
     return request
   },
 

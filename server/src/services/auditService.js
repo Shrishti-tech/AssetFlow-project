@@ -3,7 +3,7 @@ import { AuditAssignment } from "../models/AuditAssignment.js";
 import { AuditResult } from "../models/AuditResult.js";
 import { Asset } from "../models/Asset.js";
 import { User } from "../../models/User.js";
-import notificationService from "./notificationService.js";
+import notificationService, { activityLogService } from "./notificationService.js";
 
 const openCycleStatuses = ["Scheduled", "In Progress"];
 
@@ -22,7 +22,7 @@ const populateResult = (query) =>
     .populate("auditor", "fullName email");
 
 export const auditService = {
-  async createCycle(data, user) {
+  async createCycle(data, user, ipAddress) {
     if (!data.title || !data.startDate || !data.endDate) {
       fail("Title, start date and end date are required.");
     }
@@ -42,6 +42,14 @@ export const auditService = {
     });
 
     await notificationService.createForAudit("Audit Cycle Created", cycle, user._id);
+    await activityLogService.log({
+      user: user._id,
+      action: "Audit Created",
+      module: "Audit",
+      resourceId: cycle._id,
+      description: `Created audit cycle "${cycle.title}".`,
+      ipAddress,
+    });
     return this.getById(cycle._id);
   },
 
@@ -84,7 +92,7 @@ export const auditService = {
     return { cycle, assignments, results, summary };
   },
 
-  async assignAuditor(cycleId, data, user) {
+  async assignAuditor(cycleId, data, user, ipAddress) {
     if (!data.auditor) fail("Auditor is required.");
 
     const cycle = await AuditCycle.findById(cycleId);
@@ -108,6 +116,14 @@ export const auditService = {
     });
 
     await notificationService.createForAudit("Auditor Assigned", cycle, auditor._id);
+    await activityLogService.log({
+      user: user._id,
+      action: "Auditor Assigned",
+      module: "Audit",
+      resourceId: cycle._id,
+      description: `Assigned ${auditor.fullName} as an auditor for "${cycle.title}".`,
+      ipAddress,
+    });
 
     if (cycle.status === "Scheduled") {
       cycle.status = "In Progress";
@@ -118,7 +134,7 @@ export const auditService = {
     return populateAssignment(AuditAssignment.findById(assignment._id));
   },
 
-  async verifyAsset(cycleId, data, user) {
+  async verifyAsset(cycleId, data, user, ipAddress) {
     if (!data.asset || !data.status) fail("Asset and verification status are required.");
 
     const cycle = await AuditCycle.findById(cycleId);
@@ -165,10 +181,19 @@ export const auditService = {
         : `${asset.name} (${asset.assetTag}) was marked ${data.status} during "${cycle.title}".`,
     );
 
+    await activityLogService.log({
+      user: user._id,
+      action: data.status === "Verified" ? "Asset Verified" : "Discrepancy Found",
+      module: "Audit",
+      resourceId: result._id,
+      description: `${asset.name} (${asset.assetTag}) marked ${data.status} during "${cycle.title}".`,
+      ipAddress,
+    });
+
     return populateResult(AuditResult.findById(result._id));
   },
 
-  async closeAudit(cycleId, user) {
+  async closeAudit(cycleId, user, ipAddress) {
     const cycle = await AuditCycle.findById(cycleId);
     if (!cycle) return null;
     if (cycle.status === "Completed") fail("This audit cycle is already completed.");
@@ -192,6 +217,14 @@ export const auditService = {
     await Promise.all(
       [...recipients].map((recipient) => notificationService.createForAudit("Audit Completed", cycle, recipient)),
     );
+    await activityLogService.log({
+      user: user._id,
+      action: "Audit Closed",
+      module: "Audit",
+      resourceId: cycle._id,
+      description: `Closed audit cycle "${cycle.title}".`,
+      ipAddress,
+    });
 
     return this.getById(cycleId);
   },

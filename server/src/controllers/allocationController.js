@@ -24,7 +24,7 @@ export const allocationController = {
 
   async create(req, res, next) {
     try {
-      const allocation = await allocationService.create(req.body, req.user);
+      const allocation = await allocationService.create(req.body, req.user, req.ip);
       res.status(201).json(allocation);
     } catch (error) {
       if (error.conflict) {
@@ -68,6 +68,7 @@ export const allocationController = {
         req.params.id,
         req.body,
         req.user,
+        req.ip,
       );
       if (!allocation) {
         return res.status(404).json({ message: "Allocation not found." });
@@ -80,7 +81,7 @@ export const allocationController = {
 
   async requestTransfer(req, res, next) {
     try {
-      const transferRequest = await allocationService.requestTransfer(req.body, req.user);
+      const transferRequest = await allocationService.requestTransfer(req.body, req.user, req.ip);
       res.status(201).json(transferRequest);
     } catch (error) {
       next(error);
@@ -93,6 +94,7 @@ export const allocationController = {
         req.params.id,
         req.body,
         req.user,
+        req.ip,
       );
       if (!transferRequest) {
         return res.status(404).json({ message: "Transfer request not found." });
@@ -109,6 +111,7 @@ export const allocationController = {
         req.params.id,
         req.body,
         req.user,
+        req.ip,
       );
       if (!transferRequest) {
         return res.status(404).json({ message: "Transfer request not found." });

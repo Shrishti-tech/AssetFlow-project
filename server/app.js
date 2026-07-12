@@ -11,7 +11,7 @@ import { departmentRoutes } from "./routes/departmentRoutes.js";
 import { categoryRoutes } from "./routes/categoryRoutes.js";
 import { employeeRoutes } from "./routes/employeeRoutes.js";
 import { assetRoutes } from "./routes/assetRoutes.js";
-import { notificationRoutes } from "./routes/notificationRoutes.js";
+import { notificationRoutes, activityRoutes, reminderRoutes } from "./src/routes/notificationRoutes.js";
 import { faqRoutes, helpRoutes, supportRoutes } from "./routes/helpRoutes.js";
 
 export const app = express();
@@ -35,6 +35,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/reminders", reminderRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/faq", faqRoutes);
 app.use("/api/support", supportRoutes);

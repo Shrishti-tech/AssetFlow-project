@@ -24,7 +24,7 @@ export const bookingController = {
 
   async create(req, res, next) {
     try {
-      const booking = await bookingService.create(req.body);
+      const booking = await bookingService.create(req.body, req.user, req.ip);
       res.status(201).json(booking);
     } catch (error) {
       next(error);
@@ -33,7 +33,7 @@ export const bookingController = {
 
   async update(req, res, next) {
     try {
-      const booking = await bookingService.update(req.params.id, req.body);
+      const booking = await bookingService.update(req.params.id, req.body, req.user, req.ip);
       if (!booking) {
         return res.status(404).json({ message: "Booking not found." });
       }
@@ -57,7 +57,7 @@ export const bookingController = {
 
   async cancel(req, res, next) {
     try {
-      const booking = await bookingService.cancel(req.params.id, req.body);
+      const booking = await bookingService.cancel(req.params.id, req.body, req.user, req.ip);
       if (!booking) {
         return res.status(404).json({ message: "Booking not found." });
       }

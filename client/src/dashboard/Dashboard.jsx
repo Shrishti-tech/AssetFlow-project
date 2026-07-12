@@ -30,9 +30,9 @@ export default function Dashboard() {
   const [actionMessage, setActionMessage] = useState('')
 
   const unreadCount = useMemo(() => items.filter((item) => !item.read).length, [items])
-  useEffect(() => { api.get('/notifications').then(({ data }) => { if (data.notifications?.length) setItems(data.notifications.map((item) => ({ id: item._id, title: item.title, text: item.message, time: new Date(item.createdAt).toLocaleString(), type: item.type, read: item.read }))) }).catch(() => {}) }, [])
+  useEffect(() => { api.get('/notifications').then(({ data }) => { if (data.notifications?.length) setItems(data.notifications.map((item) => ({ id: item._id, title: item.title, text: item.message, time: new Date(item.createdAt).toLocaleString(), type: (item.priority || 'medium').toLowerCase(), read: item.isRead }))) }).catch(() => {}) }, [])
   const signOut = async () => { await logout(); navigate('/login') }
-  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Organization: '/organization', Reports: '/reports', Audits: '/audits', Notifications: '/notifications', 'Help & support': '/help' }
+  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Organization: '/organization', Reports: '/reports', Audits: '/audits', Notifications: '/notifications', 'Activity Logs': '/activity', Reminders: '/reminders', 'Help & support': '/help' }
   const selectPage = (page) => { setActivePage(page); setSidebarOpen(false); navigate(routes[page] || '/dashboard') }
   const runAction = (label) => {
     const actionRoutes = { 'Register Asset': '/assets/new', 'Book Resource': '/bookings/new', 'Raise Maintenance Request': '/maintenance/new' }
@@ -54,7 +54,7 @@ export default function Dashboard() {
         <KPICards search={search} onSelect={(label) => runAction(`${label} details`)} />
         <section className="dashboard-grid-main">
           <DashboardCharts />
-          <NotificationPanel open={noticeOpen} items={items} onClose={() => setNoticeOpen(false)} onRead={(id) => { api.put(`/notifications/${id}/read`).catch(() => {}); setItems((current) => current.map((item) => item.id === id ? { ...item, read: true } : item)) }} onReadAll={() => setItems((current) => current.map((item) => ({ ...item, read: true })))} />
+          <NotificationPanel open={noticeOpen} items={items} onClose={() => setNoticeOpen(false)} onRead={(id) => { api.put(`/notifications/${id}/read`).catch(() => {}); setItems((current) => current.map((item) => item.id === id ? { ...item, read: true } : item)) }} onReadAll={() => { api.put('/notifications/read-all').catch(() => {}); setItems((current) => current.map((item) => ({ ...item, read: true }))) }} />
           <QuickActions onAction={runAction} />
           <UpcomingReturns />
           <RecentActivity />

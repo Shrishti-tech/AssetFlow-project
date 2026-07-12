@@ -3,7 +3,7 @@ import auditService from "../services/auditService.js";
 export const auditController = {
   async create(req, res, next) {
     try {
-      const cycle = await auditService.createCycle(req.body, req.user);
+      const cycle = await auditService.createCycle(req.body, req.user, req.ip);
       res.status(201).json(cycle);
     } catch (error) {
       next(error);
@@ -31,7 +31,7 @@ export const auditController = {
 
   async assign(req, res, next) {
     try {
-      const assignment = await auditService.assignAuditor(req.params.id, req.body, req.user);
+      const assignment = await auditService.assignAuditor(req.params.id, req.body, req.user, req.ip);
       if (!assignment) return res.status(404).json({ message: "Audit cycle not found." });
       return res.status(201).json(assignment);
     } catch (error) {
@@ -41,7 +41,7 @@ export const auditController = {
 
   async verify(req, res, next) {
     try {
-      const result = await auditService.verifyAsset(req.params.id, req.body, req.user);
+      const result = await auditService.verifyAsset(req.params.id, req.body, req.user, req.ip);
       if (!result) return res.status(404).json({ message: "Audit cycle not found." });
       return res.json(result);
     } catch (error) {
@@ -51,7 +51,7 @@ export const auditController = {
 
   async close(req, res, next) {
     try {
-      const cycle = await auditService.closeAudit(req.params.id, req.user);
+      const cycle = await auditService.closeAudit(req.params.id, req.user, req.ip);
       if (!cycle) return res.status(404).json({ message: "Audit cycle not found." });
       return res.json(cycle);
     } catch (error) {

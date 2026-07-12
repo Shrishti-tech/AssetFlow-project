@@ -194,6 +194,18 @@ auth-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(320
 .notification-item p { margin: 5px 0; color: #4e5f73; line-height: 1.45; }
 .notification-item small { color: #8a96a8; }
 .notification-item.read { opacity: .68; }
+.notification-card-meta { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+
+.reminder-groups { display: grid; gap: 22px; }
+.reminder-group h3 { margin: 0 0 6px; font: 800 15px/1.2 Manrope, sans-serif; color: #152238; }
+.reminder-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: 1px solid #edf2f7; }
+.reminder-group .reminder-card:first-of-type { border-top: 0; }
+.reminder-card h3 { margin: 4px 0 0; font-size: 14px; color: #1d2d44; }
+.reminder-card p { margin: 3px 0; color: #4e5f73; font-size: 13px; }
+.reminder-card small { color: #8a96a8; }
+.reminder-day { display: inline-flex; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #087ea4; }
+.reminder-card-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.reminder-card-actions button { border: 1px solid #d7e2ee; border-radius: 8px; background: #fff; color: #1f3f68; padding: 6px 10px; cursor: pointer; font-size: 12px; font-weight: 800; }
 
 @media (max-width: 980px) {
   .booking-workspace, .booking-history-layout, .notification-workspace { grid-template-columns: 1fr; }

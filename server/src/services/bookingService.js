@@ -1,7 +1,7 @@
 import { Booking } from "../models/Booking.js";
 import { BookingHistory } from "../models/BookingHistory.js";
 import { Resource } from "../models/Resource.js";
-import notificationService from "./notificationService.js";
+import notificationService, { activityLogService } from "./notificationService.js";
 
 const createHistoryEntry = async (
   bookingId,
@@ -82,7 +82,7 @@ export const bookingService = {
     return Booking.findById(id).populate("resource employee");
   },
 
-  async create(data) {
+  async create(data, user, ipAddress) {
     const resource = await Resource.findById(data.resource);
     if (!resource) {
       throw new Error("Resource must exist.");
@@ -117,10 +117,21 @@ export const bookingService = {
       await Resource.findByIdAndUpdate(booking.resource, { status: "booked" });
     }
 
+    if (user) {
+      await activityLogService.log({
+        user: user._id,
+        action: "Booking Created",
+        module: "Booking",
+        resourceId: booking._id,
+        description: `Booked ${resource.name} for ${booking.startTime} - ${booking.endTime} on ${new Date(booking.bookingDate).toLocaleDateString()}.`,
+        ipAddress,
+      });
+    }
+
     return booking;
   },
 
-  async update(id, data) {
+  async update(id, data, user, ipAddress) {
     const existingBooking = await Booking.findById(id);
     if (!existingBooking) {
       return null;
@@ -180,6 +191,16 @@ export const bookingService = {
             : "Booking Updated",
         booking,
       );
+      if (user) {
+        await activityLogService.log({
+          user: user._id,
+          action: isCompleted ? "Booking Completed" : "Booking Updated",
+          module: "Booking",
+          resourceId: booking._id,
+          description: `Booking for ${booking.startTime} - ${booking.endTime} on ${new Date(booking.bookingDate).toLocaleDateString()} was ${isCompleted ? "completed" : "updated"}.`,
+          ipAddress,
+        });
+      }
     }
     return booking;
   },
@@ -192,7 +213,7 @@ export const bookingService = {
     return booking;
   },
 
-  async cancel(id, data = {}) {
+  async cancel(id, data = {}, user, ipAddress) {
     const booking = await Booking.findByIdAndUpdate(
       id,
       {
@@ -213,6 +234,16 @@ export const bookingService = {
       await Resource.findByIdAndUpdate(booking.resource, {
         status: "available",
       });
+      if (user) {
+        await activityLogService.log({
+          user: user._id,
+          action: "Booking Cancelled",
+          module: "Booking",
+          resourceId: booking._id,
+          description: `Booking for ${booking.startTime} - ${booking.endTime} on ${new Date(booking.bookingDate).toLocaleDateString()} was cancelled.`,
+          ipAddress,
+        });
+      }
     }
 
     return booking;
