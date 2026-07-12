@@ -4,6 +4,7 @@
   "workspaces": ["client", "server"],
   "scripts": {
     "client": "npm --workspace client run dev",
-    "server": "npm --workspace server run dev"
+    "server": "npm --workspace server run dev",
+    "mongo": "powershell -NoProfile -Command \"& 'C:\\Program Files\\MongoDB\\Server\\8.2\\bin\\mongod.exe' --dbpath '.mongodb-data' --bind_ip 127.0.0.1 --port 27017\""
   }
 }
