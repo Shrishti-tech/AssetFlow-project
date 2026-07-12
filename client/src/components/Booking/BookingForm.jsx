@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ResourceSelector from "./ResourceSelector";
 
-const initialValues = {
+const defaultValues = {
   resource: "",
-  employee: "",
-  department: "",
   purpose: "",
   bookingDate: new Date().toISOString().slice(0, 10),
   startTime: "09:00",
@@ -14,8 +13,15 @@ const initialValues = {
 export default function BookingForm({
   onSubmit,
   submitLabel = "Create booking",
+  employee,
+  department,
+  initialValues,
 }) {
-  const [values, setValues] = useState(initialValues);
+  const [values, setValues] = useState({ ...defaultValues, ...initialValues });
+
+  useEffect(() => {
+    setValues({ ...defaultValues, ...initialValues });
+  }, [initialValues]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -27,55 +33,18 @@ export default function BookingForm({
     onSubmit({
       ...values,
       resource: values.resource.trim(),
-      employee: values.employee.trim(),
-      department: values.department.trim(),
+      employee: employee || values.employee,
+      department: department || values.department,
       purpose: values.purpose.trim(),
       remarks: values.remarks.trim(),
     });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: "grid", gap: "0.75rem", maxWidth: "640px" }}
-    >
+    <form onSubmit={handleSubmit} className="booking-form">
+      <ResourceSelector value={values.resource} onChange={handleChange} />
       <label>
-        Resource ID
-        <input
-          name="resource"
-          value={values.resource}
-          onChange={handleChange}
-          required
-        />
-      </label>
-      <label>
-        Employee ID
-        <input
-          name="employee"
-          value={values.employee}
-          onChange={handleChange}
-          required
-        />
-      </label>
-      <label>
-        Department
-        <input
-          name="department"
-          value={values.department}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Purpose
-        <input
-          name="purpose"
-          value={values.purpose}
-          onChange={handleChange}
-          required
-        />
-      </label>
-      <label>
-        Booking date
+        Booking Date
         <input
           name="bookingDate"
           type="date"
@@ -84,15 +53,9 @@ export default function BookingForm({
           required
         />
       </label>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          gap: "0.75rem",
-        }}
-      >
+      <div className="booking-form-row">
         <label>
-          Start time
+          Start Time
           <input
             name="startTime"
             type="time"
@@ -102,7 +65,7 @@ export default function BookingForm({
           />
         </label>
         <label>
-          End time
+          End Time
           <input
             name="endTime"
             type="time"
@@ -113,6 +76,15 @@ export default function BookingForm({
         </label>
       </div>
       <label>
+        Purpose
+        <input
+          name="purpose"
+          value={values.purpose}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <label>
         Remarks
         <textarea
           name="remarks"
@@ -121,7 +93,9 @@ export default function BookingForm({
           rows="3"
         />
       </label>
-      <button type="submit">{submitLabel}</button>
+      <button className="booking-submit" type="submit">
+        {submitLabel}
+      </button>
     </form>
   );
 }

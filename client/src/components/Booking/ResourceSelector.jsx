@@ -6,7 +6,7 @@ export default function ResourceSelector({ value, onChange }) {
         name="resource"
         value={value}
         onChange={onChange}
-        placeholder="Enter a resource ID"
+        placeholder="Meeting Room A or resource ID"
         required
       />
     </label>

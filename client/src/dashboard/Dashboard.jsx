@@ -32,7 +32,7 @@ export default function Dashboard() {
   const unreadCount = useMemo(() => items.filter((item) => !item.read).length, [items])
   useEffect(() => { api.get('/notifications').then(({ data }) => { if (data.notifications?.length) setItems(data.notifications.map((item) => ({ id: item._id, title: item.title, text: item.message, time: new Date(item.createdAt).toLocaleString(), type: item.type, read: item.read }))) }).catch(() => {}) }, [])
   const signOut = async () => { await logout(); navigate('/login') }
-  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Organization: '/organization', Reports: '/reports', 'Help & support': '/profile' }
+  const routes = { Overview: '/dashboard', Assets: '/assets', Allocation: '/allocation', Bookings: '/bookings', Maintenance: '/maintenance', Transfers: '/transfers', Organization: '/organization', Reports: '/reports', Notifications: '/notifications', 'Help & support': '/profile' }
   const selectPage = (page) => { setActivePage(page); setSidebarOpen(false); navigate(routes[page] || '/dashboard') }
   const runAction = (label) => {
     const actionRoutes = { 'Register Asset': '/assets/new', 'Book Resource': '/bookings/new', 'Raise Maintenance Request': '/maintenance/new' }

@@ -14,11 +14,16 @@ bookingRoutes.get(
   requireBookingAccess,
   bookingController.calendar,
 );
+bookingRoutes.get(
+  "/:id/history",
+  requireBookingAccess,
+  bookingController.history,
+);
 bookingRoutes.get("/:id", requireBookingAccess, bookingController.getById);
 bookingRoutes.put("/:id", validateBookingPayload, bookingController.update);
 bookingRoutes.put(
   "/:id/cancel",
-  validateBookingPayload,
+  requireBookingAccess,
   bookingController.cancel,
 );
 bookingRoutes.delete("/:id", requireBookingAccess, bookingController.remove);

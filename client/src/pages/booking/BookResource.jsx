@@ -1,27 +1,31 @@
 import { useEffect, useState } from "react";
 import BookingForm from "../../components/Booking/BookingForm";
+import CalendarView from "../../components/Booking/CalendarView";
+import { useAuth } from "../../auth/hooks/useAuth";
 import { createBooking, getBookings } from "../../services/bookingService";
 
 export default function BookResource() {
+  const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [recentBookings, setRecentBookings] = useState([]);
 
-  useEffect(() => {
-    const loadBookings = async () => {
-      try {
-        const data = await getBookings({ limit: 5 });
-        setRecentBookings(Array.isArray(data) ? data : []);
-      } catch (error) {
-        setRecentBookings([]);
-      }
-    };
+  const loadBookings = async () => {
+    try {
+      const data = await getBookings({ limit: 12 });
+      setRecentBookings(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setRecentBookings([]);
+    }
+  };
 
+  useEffect(() => {
     loadBookings();
   }, []);
 
   const handleSubmit = async (values) => {
     try {
       await createBooking(values);
+      await loadBookings();
       setMessage("Booking created successfully.");
     } catch (error) {
       setMessage(error?.response?.data?.message || "Failed to create booking.");
@@ -29,25 +33,25 @@ export default function BookResource() {
   };
 
   return (
-    <div className="page-shell">
-      <h2>Book resource</h2>
-      {message ? <p>{message}</p> : null}
-      <BookingForm onSubmit={handleSubmit} />
-      <div style={{ marginTop: "1.5rem" }}>
-        <h3>Recent bookings</h3>
-        {recentBookings.length ? (
-          <ul>
-            {recentBookings.map((booking) => (
-              <li key={booking._id || booking.id}>
-                {booking.purpose || "Booking"} •{" "}
-                {booking.resource?.name || booking.resource || "—"}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No recent bookings.</p>
-        )}
+    <main className="booking-page">
+      <div className="booking-page-head">
+        <div>
+          <p className="booking-kicker">Phase 7</p>
+          <h1>Resource Booking</h1>
+        </div>
+        {message ? <p className="booking-message">{message}</p> : null}
       </div>
-    </div>
+      <div className="booking-workspace">
+        <CalendarView events={recentBookings} />
+        <aside className="booking-form-card">
+          <h2>Booking Form</h2>
+          <BookingForm
+            onSubmit={handleSubmit}
+            employee={user?.id}
+            department={user?.department}
+          />
+        </aside>
+      </div>
+    </main>
   );
 }

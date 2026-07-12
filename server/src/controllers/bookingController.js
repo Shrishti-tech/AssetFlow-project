@@ -75,6 +75,15 @@ export const bookingController = {
       next(error);
     }
   },
+
+  async history(req, res, next) {
+    try {
+      const history = await bookingService.history(req.params.id);
+      res.json(history);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export default bookingController;

@@ -1,6 +1,7 @@
 import { Booking } from "../models/Booking.js";
 import { BookingHistory } from "../models/BookingHistory.js";
 import { Resource } from "../models/Resource.js";
+import notificationService from "./notificationService.js";
 
 const createHistoryEntry = async (
   bookingId,
@@ -110,6 +111,7 @@ export const bookingService = {
     await createHistoryEntry(booking._id, "Created", data.performedBy || null, {
       data,
     });
+    await notificationService.createForBooking("Booking Created", booking);
 
     if (booking.resource) {
       await Resource.findByIdAndUpdate(booking.resource, { status: "booked" });
@@ -151,6 +153,12 @@ export const bookingService = {
       throw new Error("Booking time overlaps with an existing booking.");
     }
 
+    const isRescheduled =
+      data.bookingDate !== undefined ||
+      data.startTime !== undefined ||
+      data.endTime !== undefined;
+    const isCompleted = data.status === "Completed";
+
     const booking = await Booking.findByIdAndUpdate(
       id,
       { ...data, bookingDate, startTime, endTime },
@@ -160,9 +168,17 @@ export const bookingService = {
     if (booking) {
       await createHistoryEntry(
         booking._id,
-        "Updated",
+        isCompleted ? "Completed" : isRescheduled ? "Rescheduled" : "Updated",
         data.performedBy || null,
         { data },
+      );
+      await notificationService.createForBooking(
+        isCompleted
+          ? "Booking Completed"
+          : isRescheduled
+            ? "Booking Updated"
+            : "Booking Updated",
+        booking,
       );
     }
     return booking;
@@ -193,6 +209,7 @@ export const bookingService = {
         data.performedBy || null,
         { data },
       );
+      await notificationService.createForBooking("Booking Cancelled", booking);
       await Resource.findByIdAndUpdate(booking.resource, {
         status: "available",
       });
@@ -222,6 +239,12 @@ export const bookingService = {
       resource: booking.resource?.name,
       employee: booking.employee?.name || booking.employee?.email,
     }));
+  },
+
+  async history(id) {
+    return BookingHistory.find({ booking: id })
+      .populate("performedBy", "fullName email")
+      .sort({ createdAt: 1 });
   },
 };
 

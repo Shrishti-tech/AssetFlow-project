@@ -10,6 +10,7 @@ import Dashboard from "./dashboard/Dashboard";
 import { AssetDetails, AssetDirectory, AssetHistory, AssetProvider, EditAsset, RegisterAsset } from "./asset";
 import BookResource from "./pages/booking/BookResource";
 import BookingHistory from "./pages/booking/BookingHistory";
+import BookingCalendar from "./pages/booking/BookingCalendar";
 import RaiseRequest from "./pages/maintenance/RaiseRequest";
 import MaintenanceList from "./pages/maintenance/MaintenanceList";
 import AllocateAsset from "./pages/allocation/AllocateAsset";
@@ -19,6 +20,7 @@ import AllocationHistory from "./pages/allocation/AllocationHistory";
 import ReturnAsset from "./pages/allocation/ReturnAsset";
 import Analytics from "./pages/reports/Analytics";
 import Profile from "./pages/profile/Profile";
+import Notifications from "./pages/notifications/Notifications";
 import { OrganizationSetup } from "./organization";
 import "./styles.css";
 
@@ -41,7 +43,9 @@ export default function App() {
           <Route path="/assets/:id" element={<ProtectedRoute><AssetDetails /></ProtectedRoute>} />
           <Route path="/assets/:id/history" element={<ProtectedRoute><AssetHistory /></ProtectedRoute>} />
           <Route path="/assets/:id/edit" element={<ProtectedRoute><EditAsset /></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute><BookingCalendar /></ProtectedRoute>} />
+          <Route path="/bookings/history" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/bookings/calendar" element={<ProtectedRoute><BookingCalendar /></ProtectedRoute>} />
           <Route path="/bookings/new" element={<ProtectedRoute><BookResource /></ProtectedRoute>} />
           <Route path="/maintenance" element={<ProtectedRoute><MaintenanceList /></ProtectedRoute>} />
           <Route path="/maintenance/new" element={<ProtectedRoute><RaiseRequest /></ProtectedRoute>} />
@@ -51,6 +55,7 @@ export default function App() {
           <Route path="/returns" element={<ProtectedRoute><ReturnAsset /></ProtectedRoute>} />
           <Route path="/transfers" element={<ProtectedRoute><TransferAsset /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />

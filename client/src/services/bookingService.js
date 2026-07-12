@@ -25,6 +25,11 @@ export const cancelBooking = async (id, payload = {}) => {
   return response.data;
 };
 
+export const getBookingHistory = async (id) => {
+  const response = await api.get(`/bookings/${id}/history`);
+  return response.data;
+};
+
 export const getBookingCalendar = async (params = {}) => {
   const response = await api.get("/bookings/calendar", { params });
   return response.data;
@@ -36,5 +41,6 @@ export default {
   createBooking,
   updateBooking,
   cancelBooking,
+  getBookingHistory,
   getBookingCalendar,
 };
