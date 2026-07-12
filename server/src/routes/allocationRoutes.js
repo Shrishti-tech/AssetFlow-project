@@ -7,16 +7,21 @@ import {
 
 export const allocationRoutes = express.Router();
 
+allocationRoutes.post(
+  "/",
+  validateAllocationPayload,
+  allocationController.create,
+);
 allocationRoutes.get("/", requireAllocationAccess, allocationController.list);
 allocationRoutes.get(
   "/:id",
   requireAllocationAccess,
   allocationController.getById,
 );
-allocationRoutes.post(
-  "/",
+allocationRoutes.put(
+  "/:id/return",
   validateAllocationPayload,
-  allocationController.create,
+  allocationController.returnAllocation,
 );
 allocationRoutes.put(
   "/:id",
@@ -29,9 +34,19 @@ allocationRoutes.delete(
   allocationController.remove,
 );
 allocationRoutes.post(
-  "/transfer",
+  "/transfers",
   validateAllocationPayload,
   allocationController.requestTransfer,
+);
+allocationRoutes.put(
+  "/transfers/:id/approve",
+  validateAllocationPayload,
+  allocationController.approveTransfer,
+);
+allocationRoutes.put(
+  "/transfers/:id/reject",
+  validateAllocationPayload,
+  allocationController.rejectTransfer,
 );
 allocationRoutes.get(
   "/:id/history",

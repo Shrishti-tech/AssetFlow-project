@@ -58,12 +58,57 @@ export const allocationController = {
     }
   },
 
+  async returnAllocation(req, res, next) {
+    try {
+      const allocation = await allocationService.returnAllocation(
+        req.params.id,
+        req.body,
+      );
+      if (!allocation) {
+        return res.status(404).json({ message: "Allocation not found." });
+      }
+      return res.json(allocation);
+    } catch (error) {
+      return next(error);
+    }
+  },
+
   async requestTransfer(req, res, next) {
     try {
       const transferRequest = await allocationService.requestTransfer(req.body);
       res.status(201).json(transferRequest);
     } catch (error) {
       next(error);
+    }
+  },
+
+  async approveTransfer(req, res, next) {
+    try {
+      const transferRequest = await allocationService.approveTransfer(
+        req.params.id,
+        req.body,
+      );
+      if (!transferRequest) {
+        return res.status(404).json({ message: "Transfer request not found." });
+      }
+      return res.json(transferRequest);
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async rejectTransfer(req, res, next) {
+    try {
+      const transferRequest = await allocationService.rejectTransfer(
+        req.params.id,
+        req.body,
+      );
+      if (!transferRequest) {
+        return res.status(404).json({ message: "Transfer request not found." });
+      }
+      return res.json(transferRequest);
+    } catch (error) {
+      return next(error);
     }
   },
 

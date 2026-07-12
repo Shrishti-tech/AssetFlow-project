@@ -59,8 +59,71 @@ export const allocationService = {
     return allocation;
   },
 
+  async returnAllocation(id, data = {}) {
+    const allocation = await Allocation.findByIdAndUpdate(
+      id,
+      {
+        status: "returned",
+        returnedAt: new Date(),
+        ...data,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (allocation) {
+      await createHistoryEntry(
+        allocation._id,
+        "returned",
+        data.performedBy || null,
+        {
+          returnedAt: allocation.returnedAt,
+        },
+      );
+    }
+
+    return allocation;
+  },
+
   async requestTransfer(data) {
     return TransferRequest.create(data);
+  },
+
+  async approveTransfer(id, data = {}) {
+    const transferRequest = await TransferRequest.findByIdAndUpdate(
+      id,
+      {
+        status: "approved",
+        reviewedAt: new Date(),
+        ...data,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (transferRequest) {
+      await Allocation.findOneAndUpdate(
+        { asset: transferRequest.asset, status: { $ne: "returned" } },
+        {
+          assignedTo: transferRequest.toUser,
+          department: transferRequest.toDepartment || undefined,
+          status: "active",
+        },
+        { new: true },
+      );
+    }
+
+    return transferRequest;
+  },
+
+  async rejectTransfer(id, data = {}) {
+    return TransferRequest.findByIdAndUpdate(
+      id,
+      {
+        status: "rejected",
+        reviewedAt: new Date(),
+        ...data,
+      },
+      { new: true, runValidators: true },
+    );
   },
 
   async getHistory(allocationId) {
