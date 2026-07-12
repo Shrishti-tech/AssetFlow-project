@@ -1,0 +1,9 @@
+{
+  "name": "assetflow",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "client": "npm --workspace client run dev",
+    "server": "npm --workspace server run dev"
+  }
+}
