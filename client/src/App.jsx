@@ -22,6 +22,7 @@ import Analytics from "./pages/reports/Analytics";
 import Profile from "./pages/profile/Profile";
 import Notifications from "./pages/notifications/Notifications";
 import { OrganizationSetup } from "./organization";
+import HelpSupport from "./help/HelpSupport";
 import "./styles.css";
 
 export default function App() {
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
+          <Route path="/help" element={<ProtectedRoute><HelpSupport /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
         </AssetProvider>

@@ -9,6 +9,7 @@ import { categoryRoutes } from "./routes/categoryRoutes.js";
 import { employeeRoutes } from "./routes/employeeRoutes.js";
 import { assetRoutes } from "./routes/assetRoutes.js";
 import { notificationRoutes } from "./routes/notificationRoutes.js";
+import { faqRoutes, helpRoutes, supportRoutes } from "./routes/helpRoutes.js";
 
 export const app = express();
 app.use(
@@ -28,6 +29,9 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/help", helpRoutes);
+app.use("/api/faq", faqRoutes);
+app.use("/api/support", supportRoutes);
 app.use((error, _req, res, _next) => {
   console.error(error);
   if (error.name === "ValidationError") {
