@@ -3,6 +3,19 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "dev": "node --watch server.js", "start": "node server.js" },
-  "dependencies": { "bcryptjs": "latest", "cookie-parser": "latest", "cors": "latest", "dotenv": "latest", "express": "latest", "jsonwebtoken": "latest", "mongoose": "latest" }
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "latest",
+    "cookie-parser": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "exceljs": "^4.4.0",
+    "express": "latest",
+    "jsonwebtoken": "latest",
+    "mongoose": "latest",
+    "pdfkit": "^0.19.1"
+  }
 }

@@ -21,7 +21,12 @@ import TransferAsset from "./pages/allocation/TransferAsset";
 import AllocationList from "./pages/allocation/AllocationList";
 import AllocationHistory from "./pages/allocation/AllocationHistory";
 import ReturnAsset from "./pages/allocation/ReturnAsset";
-import Analytics from "./pages/reports/Analytics";
+import ReportsDashboard from "./pages/reports/ReportsDashboard";
+import AssetUtilization from "./pages/reports/AssetUtilization";
+import DepartmentReport from "./pages/reports/DepartmentReport";
+import BookingHeatmap from "./pages/reports/BookingHeatmap";
+import MaintenanceReport from "./pages/reports/MaintenanceReport";
+import ExportReport from "./pages/reports/ExportReport";
 import Profile from "./pages/profile/Profile";
 import Notifications from "./pages/notifications/Notifications";
 import { OrganizationSetup } from "./organization";
@@ -61,7 +66,12 @@ export default function App() {
           <Route path="/allocations/history" element={<ProtectedRoute><AllocationHistory /></ProtectedRoute>} />
           <Route path="/returns" element={<ProtectedRoute><ReturnAsset /></ProtectedRoute>} />
           <Route path="/transfers" element={<ProtectedRoute><TransferAsset /></ProtectedRoute>} />
-          <Route path="/reports" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
+          <Route path="/reports/assets" element={<ProtectedRoute><AssetUtilization /></ProtectedRoute>} />
+          <Route path="/reports/departments" element={<ProtectedRoute><DepartmentReport /></ProtectedRoute>} />
+          <Route path="/reports/bookings" element={<ProtectedRoute><BookingHeatmap /></ProtectedRoute>} />
+          <Route path="/reports/maintenance" element={<ProtectedRoute><MaintenanceReport /></ProtectedRoute>} />
+          <Route path="/reports/export" element={<ProtectedRoute><ExportReport /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/organization" element={<ProtectedRoute><OrganizationSetup /></ProtectedRoute>} />
